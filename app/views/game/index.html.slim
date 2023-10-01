@@ -12,7 +12,7 @@ div#player-prompt style="display:none;"
     = form.submit 'Continue', id: 'continue-button'
 
 div#high-scores-prompt
-  button#show-high-scores Show High Scores
+  = render partial: "player_scores", locals: { players: @players }
 div#game-container
 div#player-name-display
 
@@ -35,13 +35,16 @@ javascript:
         playerForm.addEventListener('ajax:success', function(event) {
             const [data, _status, _xhr] = event.detail;
             const playerName = data.name;
+            const playerId = data.id;
+
             console.log("PLAYER NAME => ", playerName);
+            console.log("PLAYER ID => ", playerId);
 
             // Hide the form
             this.style.display = 'none';
             title.style.display = 'none'
 
             // Initialize the Phaser game
-            initializeGame(playerName);
+            initializeGame(playerName, playerId);  // Pass the playerId to the game initialization function
         });
     });
