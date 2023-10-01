@@ -1,4 +1,4 @@
-h1 Cosmic Defender
+h1#title Cosmic Defender
 button#start-button Start Game
 div#player-prompt style="display:none;"
 
@@ -21,12 +21,14 @@ javascript:
         const startButton  = document.getElementById('start-button');
         const playerPrompt = document.getElementById('player-prompt');
         const highScores   = document.getElementById('high-scores-prompt');
+        const title        = document.getElementById('title');
 
         // Show the form when the "Start Game" button is clicked
         startButton.addEventListener('click', function() {
             playerPrompt.style.display = 'block';
             startButton.style.display  = 'none'
             highScores.style.display   = 'none'
+
         });
 
         const playerForm = document.getElementById('player-form');
@@ -37,6 +39,7 @@ javascript:
 
             // Hide the form
             this.style.display = 'none';
+            title.style.display = 'none'
 
             // Initialize the Phaser game
             initializeGame(playerName);
