@@ -36,7 +36,7 @@ class HighScoreScene extends Phaser.Scene {
 
   create() {
     // Fetch and display high scores from your Rails API
-    this.add.text(20, 20, 'High Scores', { fontSize: '32px', fill: '#fff' });
+    this.add.text(20, 20, 'High Scores', { fontSize: '48px', fill: '#fff' });
   }
 }
 
@@ -44,17 +44,21 @@ class HighScoreScene extends Phaser.Scene {
 // Initialize the game and set playerName as a global variable
 // ------------------------------------------------------------------------------
 function initializeGame(playerName) {
-  // Game configuration
+  // Initial game configuration
   const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    scene: [TitleScene, GameScene, HighScoreScene],  // GameScene is imported
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+      width: window.innerWidth,
+      height: window.innerHeight
+    },
+    scene: [TitleScene, GameScene, HighScoreScene],
     physics: {
       default: 'arcade',
       arcade: {
-        gravity: { y: 0 },  // No gravity in this game
-        debug: false  // Set it to true if you want to see the debug info
+        gravity: { y: 0 },
+        debug: false
       }
     }
   };
@@ -64,7 +68,13 @@ function initializeGame(playerName) {
 
   // Set playerName as a global variable
   game.registry.set('playerName', playerName);
+
+  // Listen for browser resize events
+  window.addEventListener('resize', function () {
+    game.scale.resize(window.innerWidth, window.innerHeight);
+  });
 }
 
 // Export the function
 export { initializeGame };
+
