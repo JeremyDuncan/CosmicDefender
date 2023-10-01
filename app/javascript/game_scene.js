@@ -4,29 +4,28 @@ class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    // Load the spaceship and star images
     this.load.image('spaceship', '/assets/player_spaceship.png');
-    this.load.image('star', '/assets/star.png');
   }
 
   create() {
-    // Create tiled star backgrounds
-    this.stars = this.add.tileSprite(0, 0, 1600, 1200, 'star');
-    this.stars.setOrigin(0, 0);
+    this.starsGraphics = [];
 
-    // Create the spaceship sprite at the center of the screen
+    for (let i = 0; i < 100; i++) {
+      const x = Phaser.Math.Between(0, 1600);
+      const y = Phaser.Math.Between(0, 1200);
+      const size = Phaser.Math.Between(1, 3);
+      const star = this.add.circle(x, y, size, 0xFFFFFF);
+      star.alpha = Phaser.Math.FloatBetween(0.5, 1);
+      this.starsGraphics.push(star);
+    }
+
     this.spaceship = this.physics.add.sprite(400, 300, 'spaceship');
     this.spaceship.setScale(0.5);
-
-    // Initialize cursor keys for movement
     this.cursors = this.input.keyboard.createCursorKeys();
-
-    // Initialize spaceship properties
     this.spaceshipSpeed = 5;
   }
 
   update() {
-    // Rotate and move the spaceship based on keyboard input
     if (this.cursors.left.isDown) {
       this.spaceship.angle -= 3;
     }
@@ -38,10 +37,23 @@ class GameScene extends Phaser.Scene {
       const dx = this.spaceshipSpeed * Math.cos(angleInRad);
       const dy = this.spaceshipSpeed * Math.sin(angleInRad);
 
-      // Move stars in the opposite direction to simulate spaceship movement
-      this.stars.tilePositionX += dy;  // Move background opposite to spaceship's up/down
-      this.stars.tilePositionY -= dx;  // Move background opposite to spaceship's right/left
+      this.starsGraphics.forEach(star => {
+        star.x -= dy;
+        star.y += dx;
+
+        if (star.x > 1600) star.x -= 1600;
+        if (star.x < 0) star.x += 1600;
+        if (star.y > 1200) star.y -= 1200;
+        if (star.y < 0) star.y += 1200;
+      });
     }
+
+    // Twinkling logic moved here
+    this.starsGraphics.forEach(star => {
+      if (Phaser.Math.Between(0, 10) > 8) {
+        star.alpha = Phaser.Math.FloatBetween(0.5, 1);
+      }
+    });
   }
 }
 
