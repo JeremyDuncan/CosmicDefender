@@ -43,7 +43,7 @@ class HighScoreScene extends Phaser.Scene {
 // ==============================================================================
 // Initialize the game and set playerName as a global variable
 // ------------------------------------------------------------------------------
-function initializeGame(playerName) {
+function initializeGame(playerName, playerId) {
   // Initial game configuration
   const config = {
     type: Phaser.AUTO,
@@ -68,6 +68,8 @@ function initializeGame(playerName) {
 
   // Set playerName as a global variable
   game.registry.set('playerName', playerName);
+  game.registry.set('playerId', playerId);
+
 
   // Listen for browser resize events
   window.addEventListener('resize', function () {
