@@ -1,52 +1,44 @@
 h1 Cosmic Defender
 button#start-button Start Game
-div#player-prompt.hidden
-    = form_with url: '/save_player', method: :post, id: 'player-form', remote: true do |form|
-        = form.label :name, 'Enter your name:'
-        = form.text_field :name, id: 'player-name'
-        = form.submit 'Continue', id: 'continue-button'
-div#high-scores-prompt.hidden
-    button#show-high-scores Show High Scores
-div#game-container
-div#player-name-display.hidden
+div#player-prompt style="display:none;"
 
-style
-    |
-    .hidden {display: none;}
+  / #######################################################################################
+  / ## FORM ##
+  / ##########
+  = form_with url: '/save_player', method: :post, id: 'player-form', local: false do |form|
+    = form.label      :name, 'Enter your name:'
+    = form.text_field :name, id: 'player-name'
+    / ########### SUBMIT BUTTON ###################
+    = form.submit 'Continue', id: 'continue-button'
+
+div#high-scores-prompt
+  button#show-high-scores Show High Scores
+div#game-container
+div#player-name-display
 
 javascript:
-    document.addEventListener("DOMContentLoaded", function () {
-        console.log("RAILS LOADED",Rails_ujs);
-        console.log("DOMContentLoaded triggered");  // Debugging line
-        const form = document.getElementById('player-form');
-        const playerNameDisplay = document.getElementById('player-name-display');
+    document.addEventListener('DOMContentLoaded', function() {
+        const startButton  = document.getElementById('start-button');
         const playerPrompt = document.getElementById('player-prompt');
+        const highScores   = document.getElementById('high-scores-prompt');
 
-        form.addEventListener('submit', function (event) {
-            console.log("RAILS SUBMITTED", Rails_ujs);
+        // Show the form when the "Start Game" button is clicked
+        startButton.addEventListener('click', function() {
+            playerPrompt.style.display = 'block';
+            startButton.style.display  = 'none'
+            highScores.style.display   = 'none'
+        });
 
-            event.preventDefault();  // Prevent normal form submission
-            console.log("Form submit prevented");  // Debugging line
+        const playerForm = document.getElementById('player-form');
+        playerForm.addEventListener('ajax:success', function(event) {
+            const [data, _status, _xhr] = event.detail;
+            const playerName = data.name;
+            console.log("PLAYER NAME => ", playerName);
 
-            const playerName = document.getElementById('player-name').value;
+            // Hide the form
+            this.style.display = 'none';
 
-            Rails.ajax({
-                url: "/save_player",
-                type: "POST",
-                data: "name=" + playerName,
-                success: function(data) {
-                    console.log("Ajax success:", data);  // Debugging line
-
-                    // Hide the form
-                    playerPrompt.classList.add('hidden');
-
-                    // Display the player's name
-                    playerNameDisplay.textContent = `Welcome, ${data.name || "Unknown Player"}`;
-                    playerNameDisplay.classList.remove('hidden');
-                },
-                error: function(data) {
-                    console.log("Ajax error:", data);  // Debugging line
-                }
-            });
+            // Initialize the Phaser game
+            initializeGame(playerName);
         });
     });
