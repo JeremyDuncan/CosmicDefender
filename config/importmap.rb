@@ -10,3 +10,4 @@ pin "game", to: "game.js"
 pin "phaser", to: "https://ga.jspm.io/npm:phaser@3.60.0/dist/phaser.js"
 
 pin "process", to: "https://ga.jspm.io/npm:@jspm/core@2.0.1/nodelibs/browser/process-production.js"
+pin "@rails/ujs", to: "https://ga.jspm.io/npm:@rails/ujs@7.0.8/lib/assets/compiled/rails-ujs.js"

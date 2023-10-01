@@ -14,18 +14,3 @@ eagerLoadControllersFrom("controllers", application)
 // import '../game';
 
 // DOMContentLoaded ensures the DOM is fully loaded before executing the script
-document.addEventListener("DOMContentLoaded", function() {
-    const startButton      = document.getElementById("start-button");
-    const playerPrompt     = document.getElementById("player-prompt");
-    const continueButton   = document.getElementById("continue-button");
-    const highScoresPrompt = document.getElementById("high-scores-prompt");
-
-    startButton.addEventListener("click", function() {
-        playerPrompt.classList.remove("hidden");
-    });
-
-    continueButton.addEventListener("click", function() {
-        // Fetch or save player name here
-        highScoresPrompt.classList.remove("hidden");
-    });
-});
