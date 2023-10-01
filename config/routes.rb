@@ -1,10 +1,15 @@
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   # Set the root route
-  root to: 'home#index'
+  root to: 'game#index'
   # Defines the root path route ("/")
   # root "articles#index"
-  #
+
+
+  post '/save_player', to: 'game#save_player', defaults: { format: 'json' }
+
+
+
   resources :players do
     member do
       get 'high_scores'
