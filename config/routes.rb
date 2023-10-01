@@ -8,6 +8,11 @@ Rails.application.routes.draw do
 
   post '/save_player', to: 'game#save_player', defaults: { format: 'json' }
 
+  namespace :api, defaults: { format: 'json' } do
+    namespace :v1 do
+      patch '/players/:id/update_score', to: 'players#update_score'
+    end
+  end
 
 
   resources :players do
