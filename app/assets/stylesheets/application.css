@@ -15,5 +15,9 @@
  */
 body, html {
     margin: 0;
-    padding: 0px 30px 0px 10px;
+    /*padding: 0px 30px 0px 10px;*/
 }
+.container {display: flex; align-items: center; justify-content: center; margin: auto}
+.col {flex-direction: column}
+.reduce {width: 10%}
+.round {border-radius: 8px}

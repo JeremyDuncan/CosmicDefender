@@ -1,50 +1,112 @@
+canvas#starfield
 h1#title Cosmic Defender
 button#start-button Start Game
 div#player-prompt style="display:none;"
 
-  / #######################################################################################
-  / ## FORM ##
-  / ##########
-  = form_with url: '/save_player', method: :post, id: 'player-form', local: false do |form|
-    = form.label      :name, 'Enter your name:'
-    = form.text_field :name, id: 'player-name'
-    / ########### SUBMIT BUTTON ###################
-    = form.submit 'Continue', id: 'continue-button'
+    / #######################################################################################
+    / ## FORM ##
+    / ##########
+    = form_with url: '/save_player', method: :post, id: 'player-form', local: false, html: { class: 'form-container' } do |form|
+        div.form-container
+            .container.col.reduce.round
+                = form.label :name, 'Enter your name:', class: 'form-label'
+                = form.text_field :name, id: 'player-name', class: 'form-input'
+            / ########### SUBMIT BUTTON ###################
+            = form.submit 'Continue', id: 'continue-button', class: 'btn'
 
 div#high-scores-prompt
-  = render partial: "player_scores", locals: { players: @players }
+    = render partial: "player_scores", locals: { players: @players }
 div#game-container
 div#player-name-display
 
+audio#audio-player loop="loop" style="display:none;"
+    source src=asset_path("intro.mp3") type="audio/mp3"
+
+
 javascript:
-    document.addEventListener('DOMContentLoaded', function() {
-        const startButton  = document.getElementById('start-button');
-        const playerPrompt = document.getElementById('player-prompt');
-        const highScores   = document.getElementById('high-scores-prompt');
-        const title        = document.getElementById('title');
-
-        // Show the form when the "Start Game" button is clicked
-        startButton.addEventListener('click', function() {
-            playerPrompt.style.display = 'block';
-            startButton.style.display  = 'none'
-            highScores.style.display   = 'none'
-
+    $(document).ready(function () {
+        // Play the audio when the user moves the mouse over the body
+        document.body.addEventListener('mousemove', function playAudioOnce() {
+            const audio = document.getElementById('audio-player');
+            audio.play().then(() => {
+                // Remove the event listener after playing
+                document.body.removeEventListener('mousemove', playAudioOnce);
+            }).catch((error) => {
+                console.error("Audio play failed:", error);
+            });
         });
 
-        const playerForm = document.getElementById('player-form');
-        playerForm.addEventListener('ajax:success', function(event) {
+        let animateStars = true;  // Add this flag to control the animation
+
+        const canvas = $('#starfield')[0];
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = $(window).width();
+            canvas.height = $(window).height();
+        }
+
+        function createStars() {
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 3 + 1,
+                    speed: Math.random() * 3 + 1
+                });
+            }
+        }
+
+        function drawStars() {
+            if (!animateStars) return;  // Stop drawing if the flag is false
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+                star.y += star.speed;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                }
+            });
+        }
+
+        function animate() {
+            drawStars();
+            if (animateStars) {  // Only continue the animation if the flag is true
+                requestAnimationFrame(animate);
+            }
+        }
+
+        // Show the form when the "Start Game" button is clicked
+        $('#start-button').click(function () {
+            $('#player-prompt').show();
+            $('#start-button').hide();
+            $('#high-scores-prompt').hide();
+        });
+
+        // Handle AJAX success for the player form
+        $('#player-form').on('ajax:success', function (event) {
+            console.log("SUCCESS!!")
             const [data, _status, _xhr] = event.detail;
             const playerName = data.name;
             const playerId = data.id;
-
-            console.log("PLAYER NAME => ", playerName);
-            console.log("PLAYER ID => ", playerId);
+            animateStars = false;
 
             // Hide the form
-            this.style.display = 'none';
-            title.style.display = 'none'
+            $(this).hide();
+            $('#title').hide();
 
             // Initialize the Phaser game
             initializeGame(playerName, playerId);  // Pass the playerId to the game initialization function
         });
+
+        resizeCanvas();
+        createStars();
+        animate();
+
+        // Handle window resize
+        $(window).resize(resizeCanvas);
     });
