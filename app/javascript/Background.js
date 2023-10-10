@@ -34,10 +34,8 @@ class Background {
   // Randomly change the alpha value of the stars for a twinkling effect
   // ------------------------------------------------------------------------------
   randomizeAlpha() {
-    console.log("Randomizing alpha");
     this.starsGraphics.getChildren().forEach(star => {
       if (Phaser.Math.Between(0, 10) > 8) {
-        console.log("Randomizing alpha TRUE");
         star.alpha = Phaser.Math.FloatBetween(0.5, 1);
       }
     });
