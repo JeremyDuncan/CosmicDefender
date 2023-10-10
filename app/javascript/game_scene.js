@@ -1,40 +1,14 @@
 // Importing Phaser's Scene class to extend it
+import Alien      from './Alien';       // Import the Alien class
+import Background from './Background';  // Import the Background class
+import Laser      from './Laser';       // Import the Laser class
+import Scoreboard from './Scoreboard';  // Import the Scoreboard class
+
 class GameScene extends Phaser.Scene {
-  // Constructor function
   constructor() {
-    // Call the constructor of the parent class (Phaser.Scene)
-    super({ key: 'GameScene' });
-    // Initialize the score variable to 0
-    this.score = 0;
-    // Initialize the game over flag to false
-    this.gameOver = false;
-  }
-
-  // ==============================================================================
-  // Function to update player score in the database
-  // ------------------------------------------------------------------------------
-  async updatePlayerScoreInDB(playerId) {
-    // Log the playerId for debugging
-    console.log("Player ID:", playerId);
-    // Fetch CSRF token from meta tag
-    const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
-    // Define the URL for the API endpoint
-    const url = `http://localhost:3000/api/v1/players/${playerId}/update_score`;
-
-    try {
-      // Make an asynchronous PATCH request to update the score
-      const response = await fetch(url, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': csrfToken  // Include CSRF token for security
-        },
-        body: JSON.stringify({ score: this.score })  // Send the score as JSON
-      });
-    } catch (error) {
-      // Log any errors that occur during the fetch
-      console.error('There was a problem updating the score:', error);
-    }
+    super({ key: 'GameScene' });  // Call the constructor of the parent class (Phaser.Scene)
+    this.score = 0;               // Initialize the score variable to 0
+    this.gameOver = false;        // Initialize the game over flag to false
   }
 
   // Preload function to load assets
@@ -48,25 +22,15 @@ class GameScene extends Phaser.Scene {
 
   // Create function to set up the game scene
   create() {
+    // Initialize classes
+    this.background = new Background(this);  // Create an instance of the Background class
+    this.alien      = new Alien(this);       // Create an instance of the Alien class
+    this.laser      = new Laser(this);       // Create an instance of the Laser class
+    this.scoreboard = new Scoreboard(this);  // Initialize the Scoreboard class
+
     // Initialize arrays and groups
     this.starsGraphics = [];
     this.explosions = this.add.group();
-
-    // Create a text object for the scoreboard at the top right corner
-    this.scoreText = this.add.text(10, 10, `Score: ${this.score}`, {
-      fontSize: '32px',
-      fill: '#fff'
-    });
-
-    // Create stars in the background
-    for (let i = 0; i < 100; i++) {
-      const x = Phaser.Math.Between(0, 1600);
-      const y = Phaser.Math.Between(0, 1200);
-      const size = Phaser.Math.Between(1, 3);
-      const star = this.add.circle(x, y, size, 0xFFFFFF);
-      star.alpha = Phaser.Math.FloatBetween(0.5, 1);
-      this.starsGraphics.push(star);
-    }
 
     // Define the explosion animation
     this.anims.create({
@@ -82,14 +46,9 @@ class GameScene extends Phaser.Scene {
     this.spaceship.setScale(0.4);
     this.cursors = this.input.keyboard.createCursorKeys();
     this.spaceshipSpeed = 5;
-
-    // Create a group for lasers
-    this.lasers = this.physics.add.group();
-    // Create a key object for the spacebar
-    this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
-    // Create a group for alien spaceships
-    this.alienSpaceships = this.physics.add.group();
+    this.lasers   = this.physics.add.group(); // Create a group for lasers
+    this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);  // Create a key object for the spacebar
+    this.alienSpaceships = this.physics.add.group();  // Create a group for alien spaceships
 
     // Create a text object for the "Game Over" message but set it to be invisible initially
     this.gameOverText = this.add.text(this.scale.width / 2, this.scale.height / 2, 'Game Over', {
@@ -98,146 +57,59 @@ class GameScene extends Phaser.Scene {
     }).setOrigin(0.5).setVisible(false);
   }
 
-  // Update function to handle game logic
   update() {
+    // =========================
     // Handle spaceship rotation
+    // -------------------------
     if (this.cursors.left.isDown) {
       this.spaceship.angle -= 3;
     }
     if (this.cursors.right.isDown) {
       this.spaceship.angle += 3;
     }
-
+    // =========================
     // Handle spaceship movement
+    // -------------------------
     if (this.cursors.up.isDown) {
       const angleInRad = Phaser.Math.DegToRad(this.spaceship.angle);
       const dx = this.spaceshipSpeed * Math.cos(angleInRad);
       const dy = this.spaceshipSpeed * Math.sin(angleInRad);
-
-      // Update positions of stars and explosions based on spaceship movement
-      this.starsGraphics.forEach(star => {
-        star.x -= dy;
-        star.y += dx;
-
-        // Wrap stars around the screen
-        if (star.x < 0) star.x += 1600;
-        if (star.x > 1600) star.x -= 1600;
-        if (star.y < 0) star.y += 1200;
-        if (star.y > 1200) star.y -= 1200;
-      });
-
+      // =================================================
+      // Update star positions based on spaceship movement
+      // -------------------------------------------------
+      this.background.updateStars(dx, dy);
+      // ==============================
       // Update positions of explosions
+      // ==============================
       this.explosions.getChildren().forEach(explosion => {
         explosion.x -= dy;
         explosion.y += dx;
-
+        // =================================
         // Wrap explosions around the screen
-        if (explosion.x < 0) explosion.x += 1600;
+        // ---------------------------------
+        if (explosion.x < 0) explosion.x    += 1600;
         if (explosion.x > 1600) explosion.x -= 1600;
-        if (explosion.y < 0) explosion.y += 1200;
+        if (explosion.y < 0) explosion.y    += 1200;
         if (explosion.y > 1200) explosion.y -= 1200;
       });
     }
 
-    // Randomly change the alpha value of stars
-    this.starsGraphics.forEach(star => {
-      if (Phaser.Math.Between(0, 10) > 8) {
-        star.alpha = Phaser.Math.FloatBetween(0.5, 1);
-      }
-    });
-
-    // Handle laser firing
-    if (Phaser.Input.Keyboard.JustDown(this.spacebar)) {
-      // Calculate the angle and position for the laser
-      const angleInRad = Phaser.Math.DegToRad(this.spaceship.angle - 90);
-      const dx = Math.cos(angleInRad);
-      const dy = Math.sin(angleInRad);
-
-      // Calculate the starting position for the laser
-      const laserStartX = this.spaceship.x + 20 * dx;
-      const laserStartY = this.spaceship.y + 20 * dy;
-
-      // Create a laser sprite
-      const laser = this.lasers.create(laserStartX, laserStartY, 'laser');
-      laser.setScale(0.5);
-      laser.setAngle(this.spaceship.angle - 90);
-      laser.setVelocity(500 * dx, 500 * dy);
-      laser.setDepth(this.spaceship.depth - 1);
-    }
-
-    // Set the depth of the spaceship to be above lasers
-    this.spaceship.setDepth(1);
-
-    // Destroy lasers that go off-screen
-    this.lasers.getChildren().forEach(laser => {
-      if (laser.x < 0 || laser.x > 1600 || laser.y < 0 || laser.y > 1200) {
-        laser.destroy();
-      }
-    });
+    this.background.randomizeAlpha(); // Randomly change the alpha value of stars
+    this.laser.fire(this.spacebar, this.spaceship, this.spaceship.angle); // Handle laser firing using Laser class
+    this.laser.destroyOffScreen(); // Destroy lasers that go off-screen using Laser class
 
     // Handle alien spaceship spawning
     if (Phaser.Math.Between(0, 100) > 95) {
-      // Randomly generate a position for the alien spaceship
-      let attempts = 0;
-      let x, y;
-      let tooClose;
-      do {
-        x = Phaser.Math.Between(-100, -50);
-        y = Phaser.Math.Between(-100, -50);
-        // Check if the new alien spaceship is too close to existing ones
-        tooClose = this.alienSpaceships.getChildren().some(alienSpaceship => {
-          return Phaser.Math.Distance.Between(x, y, alienSpaceship.x, alienSpaceship.y) < 100;
-        });
-        attempts++;
-      } while (tooClose && attempts < 10);
-
-      // Create an alien spaceship if it's not too close to existing ones
-      if (!tooClose) {
-        const alienSpaceship = this.alienSpaceships.create(x, y, 'alienSpaceship');
-        alienSpaceship.setScale(0.05);
-      }
+      this.alien.spawnAlien();
     }
 
     // Handle alien spaceship movement
-    this.alienSpaceships.getChildren().forEach(alienSpaceship => {
-      // If the alien spaceship is within the screen bounds
-      if (alienSpaceship.x >= 0 && alienSpaceship.x <= this.scale.width &&
-        alienSpaceship.y >= 0 && alienSpaceship.y <= this.scale.height) {
+    this.alien.moveAliens(this.spaceship, this.spaceshipSpeed);
 
-        // Calculate the angle between the alien spaceship and the player's spaceship
-        const angleToPlayer = Phaser.Math.Angle.Between(
-          alienSpaceship.x, alienSpaceship.y,
-          this.spaceship.x, this.spaceship.y
-        );
+    // Collision handling between lasers and alien spaceships
+    this.physics.overlap(this.laser.getLasers(), this.alien.getAlienSpaceships(), (laser, alienSpaceship) => {
+      console.log("Collision detected");  // Debugging line
 
-        // Set the velocity of the alien spaceship to move towards the player
-        const velocity = 50;
-        alienSpaceship.setVelocity(
-          velocity * Math.cos(angleToPlayer),
-          velocity * Math.sin(angleToPlayer)
-        );
-      }
-
-      // Update the position of the alien spaceship based on the player's movement
-      if (this.cursors.up.isDown) {
-        const angleInRad = Phaser.Math.DegToRad(this.spaceship.angle);
-        const dx = this.spaceshipSpeed * Math.cos(angleInRad);
-        const dy = this.spaceshipSpeed * Math.sin(angleInRad);
-
-        alienSpaceship.x -= dy;
-        alienSpaceship.y += dx;
-      }
-
-      // Destroy alien spaceships that go off-screen
-      if (alienSpaceship.x < -100 || alienSpaceship.x > this.scale.width + 100 ||
-        alienSpaceship.y < -100 || alienSpaceship.y > this.scale.height + 100) {
-        alienSpaceship.destroy();
-      }
-    });
-
-    // Handle collisions between lasers and alien spaceships
-    this.physics.overlap(this.lasers, this.alienSpaceships, (laser, alienSpaceship) => {
-      // Destroy the laser and alien spaceship upon collision
       laser.destroy();
       alienSpaceship.destroy();
 
@@ -245,15 +117,11 @@ class GameScene extends Phaser.Scene {
       const explosion = this.add.sprite(alienSpaceship.x, alienSpaceship.y, 'explosion');
       explosion.play('explode');
       this.explosions.add(explosion);  // Add the explosion to the group
-
-      // Update the score and scoreboard
-      this.score += 10;
-      this.scoreText.setText(`Score: ${this.score}`);
+      this.scoreboard.updateScore(10); // Update the score using Scoreboard class
     });
 
     // Handle collisions between the player's spaceship and alien spaceships
-    this.physics.overlap(this.spaceship, this.alienSpaceships, (spaceship, alienSpaceship) => {
-      // Create explosions at the collision points and destroy both spaceships
+    this.physics.overlap(this.spaceship, this.alien.getAlienSpaceships(), (spaceship, alienSpaceship) => {
       const alienExplosion = this.add.sprite(alienSpaceship.x, alienSpaceship.y, 'explosion');
       alienExplosion.play('explode');
       this.explosions.add(alienExplosion);
@@ -266,8 +134,7 @@ class GameScene extends Phaser.Scene {
 
       // Update the player's score in the database and display the "Game Over" text
       this.time.delayedCall(1000, async () => {
-        const playerId = this.registry.get('playerId');  // Retrieve the playerId from the registry
-        await this.updatePlayerScoreInDB(playerId);
+        const playerId = this.registry.get('playerId');
         this.gameOverText.setVisible(true);
       });
 
@@ -278,7 +145,6 @@ class GameScene extends Phaser.Scene {
     });
   }
 }
-
 // Export the GameScene class for use in other files
 export default GameScene;
 
