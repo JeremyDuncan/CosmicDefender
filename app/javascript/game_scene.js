@@ -10,7 +10,7 @@ class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
     this.score = 0;
-    this.gameOver = false;
+    this.inputEnabled = true;  // Add this line
   }
 
   preload() {
@@ -22,7 +22,9 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    // Initialize classes
+    this.inputEnabled = true;  // Reset the input flag
+
+    // nitialize classes
     this.background = new Background(this);
     this.alien = new Alien(this);
     this.laser = new Laser(this);
@@ -46,9 +48,31 @@ class GameScene extends Phaser.Scene {
       fontSize: '64px',
       fill: '#ff0000'
     }).setOrigin(0.5).setVisible(false);
+
+    // ==============================================================================
+    // Create a text object for the "Retry" button but set it to be invisible initially
+    // ------------------------------------------------------------------------------
+    this.retryText = this.add.text(this.scale.width / 2, this.scale.height / 2 + 80, 'Retry', {
+      fontSize: '32px',
+      fill: '#00ff00'
+    }).setOrigin(0.5).setVisible(false).setInteractive();
+
+    // Add a click event to the "Retry" text
+    this.retryText.on('pointerdown', () => this.retryGame());
+  }
+
+  // ==========================
+  // Method to restart the game
+  // --------------------------
+  retryGame() {
+    console.log("RESTART")
+    this.scene.start('GameScene');  // Start a new instance of the GameScene
   }
 
   update() {
+    if (!this.inputEnabled) {
+      return;  // Skip the rest of the update if input is disabled
+    }
     // ==============
     // Input Controls
     // --------------
@@ -94,15 +118,11 @@ class GameScene extends Phaser.Scene {
       alienSpaceship.destroy();
       spaceship.destroy();
 
-      // Update the player's score in the database and display the "Game Over" text
-      this.time.delayedCall(1000, async () => {
-        const playerId = this.registry.get('playerId');
-        this.gameOverText.setVisible(true);
-      });
-
+      this.inputEnabled = false;  // Disable input
       // Pause the scene after a delay
       this.time.delayedCall(2000, () => {
         this.scene.pause();
+        this.scene.launch('GameOverScene');
       });
     });
   }
