@@ -1,7 +1,12 @@
 # app/controllers/game_controller.rb
 class GameController < ApplicationController
   def index
-    @players = Player.order(score: :desc).limit(10)
+    # @high_scores = HighScore.where("score IS NOT NULL AND score > 0 AND score != ''")
+    #                         .order(score: :desc)
+    #                         .limit(10)
+
+    @players = Player.where("score IS NOT NULL AND score > 0")
+                     .order(score: :desc).limit(10)
   end
   # app/controllers/game_controller.rb
   def save_player

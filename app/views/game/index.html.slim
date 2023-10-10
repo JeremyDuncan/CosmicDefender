@@ -19,8 +19,23 @@ div#high-scores-prompt
 div#game-container
 div#player-name-display
 
+audio#audio-player loop="loop" style="display:none;"
+    source src=asset_path("intro.mp3") type="audio/mp3"
+
+
 javascript:
     $(document).ready(function () {
+        // Play the audio when the user moves the mouse over the body
+        document.body.addEventListener('mousemove', function playAudioOnce() {
+            const audio = document.getElementById('audio-player');
+            audio.play().then(() => {
+                // Remove the event listener after playing
+                document.body.removeEventListener('mousemove', playAudioOnce);
+            }).catch((error) => {
+                console.error("Audio play failed:", error);
+            });
+        });
+
         let animateStars = true;  // Add this flag to control the animation
 
         const canvas = $('#starfield')[0];
