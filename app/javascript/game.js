@@ -13,9 +13,9 @@ class TitleScene extends Phaser.Scene {
 
   create() {
     const playerName = this.registry.get('playerName');  // Retrieve playerName from the registry
-    const centerX = this.scale.width / 2;
-    const centerY = this.scale.height / 2;
-    this.background = new Background(this);
+    const centerX    = this.scale.width / 2;
+    const centerY    = this.scale.height / 2;
+    this.background  = new Background(this);
 
 
     const title = this.add.text(centerX, centerY - 100, 'Cosmic Defender', { fontSize: '32px', fill: '#fff' });
