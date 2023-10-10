@@ -1,5 +1,7 @@
-import Phaser from 'phaser';
-import GameScene from './game_scene';
+import Phaser        from 'phaser';
+import GameScene     from './game_scene';
+import GameOverScene from './game_over_scene';
+import Background    from './Background';
 
 // ==============================================================================
 // TitleScene class
@@ -11,18 +13,28 @@ class TitleScene extends Phaser.Scene {
 
   create() {
     const playerName = this.registry.get('playerName');  // Retrieve playerName from the registry
+    const centerX = this.scale.width / 2;
+    const centerY = this.scale.height / 2;
+    this.background = new Background(this);
 
-    const title = this.add.text(400, 300, 'Cosmic Defender', { fontSize: '32px', fill: '#fff' });
+
+    const title = this.add.text(centerX, centerY - 100, 'Cosmic Defender', { fontSize: '32px', fill: '#fff' });
     title.setOrigin(0.5);
 
     // Display the player name
-    const welcomeText = this.add.text(400, 350, `Welcome ${playerName}`, { fontSize: '24px', fill: '#fff' });
+    const welcomeText = this.add.text(centerX, centerY, `Welcome ${playerName}`, { fontSize: '24px', fill: '#fff' });
     welcomeText.setOrigin(0.5);
 
-    const startButton = this.add.text(400, 400, 'Start Game', { fontSize: '32px', fill: '#fff' });
+    const startButton = this.add.text(centerX, centerY + 100, 'Start Game', { fontSize: '32px', fill: '#fff' });
     startButton.setOrigin(0.5);
     startButton.setInteractive();
     startButton.on('pointerdown', () => this.scene.start('GameScene'));  // No need to pass playerName here
+  }
+
+  update() {
+    // Update the starfield
+    this.background.updateStars(0.5, 0.5);  // You can adjust these values to control the speed
+    this.background.randomizeAlpha();
   }
 }
 
@@ -53,7 +65,7 @@ function initializeGame(playerName, playerId) {
       width: window.innerWidth,
       height: window.innerHeight
     },
-    scene: [TitleScene, GameScene, HighScoreScene],
+    scene: [TitleScene, GameScene, HighScoreScene, GameOverScene],  // Add GameOverScene here
     physics: {
       default: 'arcade',
       arcade: {
