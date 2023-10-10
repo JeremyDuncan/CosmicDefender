@@ -93,7 +93,9 @@ class GameScene extends Phaser.Scene {
 
     // Handle alien spaceship spawning
     if (Phaser.Math.Between(0, 100) > 95) {
-      this.alien.spawnAlien();
+      this.alien.spawnAlien(this.scale.width, this.scale.height);
+      this.alien.spawnAlien(this.scale.width, this.scale.height);
+      this.alien.spawnAlien(this.scale.width, this.scale.height);
     }
 
     // Handle alien spaceship movement
