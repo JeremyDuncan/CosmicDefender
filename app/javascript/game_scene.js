@@ -1,18 +1,18 @@
-// Importing Phaser's Scene class to extend it
-import Alien      from './Alien';       // Import the Alien class
-import Background from './Background';  // Import the Background class
-import Laser      from './Laser';       // Import the Laser class
-import Explosion  from './Explosion';   // Import the Explosion class
-import Scoreboard from './Scoreboard';  // Import the Scoreboard class
+// Importing required classes
+import Alien        from './Alien';
+import Background   from './Background';
+import Laser        from './Laser';
+import Explosion    from './Explosion';
+import Scoreboard   from './Scoreboard';
+import InputHandler from './InputHandler';
 
 class GameScene extends Phaser.Scene {
   constructor() {
-    super({ key: 'GameScene' });  // Call the constructor of the parent class (Phaser.Scene)
-    this.score = 0;               // Initialize the score variable to 0
-    this.gameOver = false;        // Initialize the game over flag to false
+    super({ key: 'GameScene' });
+    this.score = 0;
+    this.gameOver = false;
   }
 
-  // Preload function to load assets
   preload() {
     // Load images and sprites
     this.load.image('spaceship', '/assets/player_spaceship.png');
@@ -21,24 +21,25 @@ class GameScene extends Phaser.Scene {
     this.load.spritesheet('explosion', '/assets/explosions/explosion_1.png', { frameWidth: 256, frameHeight: 256 });
   }
 
-  // Create function to set up the game scene
   create() {
     // Initialize classes
     this.background = new Background(this);
-    this.alien      = new Alien(this);
-    this.laser      = new Laser(this);
-    this.explosion  = new Explosion(this);
+    this.alien = new Alien(this);
+    this.laser = new Laser(this);
+    this.explosion = new Explosion(this);
     this.scoreboard = new Scoreboard(this);
 
     // Initialize arrays and groups
     this.starsGraphics = [];
     this.spaceship = this.physics.add.sprite(this.scale.width / 2, this.scale.height / 2, 'spaceship');
     this.spaceship.setScale(0.4);
-    this.cursors = this.input.keyboard.createCursorKeys();
     this.spaceshipSpeed = 5;
     this.lasers = this.physics.add.group();
-    this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.alienSpaceships = this.physics.add.group();
+
+    this.cursors = this.input.keyboard.createCursorKeys();
+    this.inputHandler = new InputHandler(this.input, this.cursors, this.spaceship, this.spaceshipSpeed);  // Initialize the InputHandler class
+
 
     // Create a text object for the "Game Over" message but set it to be invisible initially
     this.gameOverText = this.add.text(this.scale.width / 2, this.scale.height / 2, 'Game Over', {
@@ -48,29 +49,22 @@ class GameScene extends Phaser.Scene {
   }
 
   update() {
-    // Handle spaceship rotation
-    if (this.cursors.left.isDown) {
-      this.spaceship.angle -= 3;
+    // ==============
+    // Input Controls
+    // --------------
+    let dx = 0, dy = 0;  // Declare dx and dy here
+    const inputResult = this.inputHandler.handleInput();  // Get dx, dy from InputHandler
+    if (inputResult) {
+      dx = inputResult.dx;
+      dy = inputResult.dy;
     }
-    if (this.cursors.right.isDown) {
-      this.spaceship.angle += 3;
-    }
-
-    // Handle spaceship movement
-    if (this.cursors.up.isDown) {
-      const angleInRad = Phaser.Math.DegToRad(this.spaceship.angle);
-      const dx = this.spaceshipSpeed * Math.cos(angleInRad);
-      const dy = this.spaceshipSpeed * Math.sin(angleInRad);
-
-      // Update star positions based on spaceship movement
-      this.background.updateStars(dx, dy);
-
-      // Update positions of explosions
-      this.explosion.updateExplosions(dx, dy);
+    if (dx !== 0 || dy !== 0) {
+      this.background.updateStars(dx, dy);     // Update star positions based on spaceship movement
+      this.explosion.updateExplosions(dx, dy); // Update positions of explosions
     }
 
     this.background.randomizeAlpha();
-    this.laser.fire(this.spacebar, this.spaceship, this.spaceship.angle);
+    this.laser.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
     this.laser.destroyOffScreen();
 
     // Handle alien spaceship spawning
