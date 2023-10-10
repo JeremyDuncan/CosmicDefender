@@ -3,7 +3,7 @@ h1#title Cosmic Defender
 button#start-button Start Game
 div#player-prompt style="display:none;"
 
-    / #######################################################################################
+    / ###################################################
     / ## FORM ##
     / ##########
     = form_with url: '/save_player', method: :post, id: 'player-form', local: false, html: { class: 'form-container' } do |form|
@@ -21,6 +21,14 @@ div#player-name-display
 
 audio#audio-player loop="loop" style="display:none;"
     source src=asset_path("intro.mp3") type="audio/mp3"
+
+/#########################################################
+/## MODAL SECTION ##
+/###################
+div#nameModal.modal
+    div.modal-content
+        span.close-button &times;
+        p Please enter your name to continue.
 
 
 javascript:
@@ -87,20 +95,35 @@ javascript:
             $('#high-scores-prompt').hide();
         });
 
+        // Get the modal and the close button
+        const modal = document.getElementById('nameModal');
+        const closeButton = document.getElementsByClassName('close-button')[0];
+
+        // When the user clicks on the close button, close the modal
+        closeButton.onclick = function () {
+            modal.style.display = 'none';
+        };
         // Handle AJAX success for the player form
         $('#player-form').on('ajax:success', function (event) {
-            console.log("SUCCESS!!")
+            console.log("SUCCESS!!");
             const [data, _status, _xhr] = event.detail;
             const playerName = data.name;
             const playerId = data.id;
-            animateStars = false;
 
-            // Hide the form
-            $(this).hide();
-            $('#title').hide();
+            // Check if the player name is entered
+            if (playerName && playerName.trim() !== '') {
+                animateStars = false;
 
-            // Initialize the Phaser game
-            initializeGame(playerName, playerId);  // Pass the playerId to the game initialization function
+                // Hide the form
+                $(this).hide();
+                $('#title').hide();
+
+                // Initialize the Phaser game
+                initializeGame(playerName, playerId);
+            } else {
+                // Show the modal
+                modal.style.display = 'block';
+            }
         });
 
         resizeCanvas();
