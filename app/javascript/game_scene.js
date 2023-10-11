@@ -16,30 +16,37 @@ class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
     this.score = 0;
-    this.inputEnabled = true;  // Add this line
+    this.inputEnabled = true;
   }
 
   //####################################################################################################################
-  //#######  PRELOAD  ##################################################################################################
+  //#######  PRELOAD  (Assets) #########################################################################################
   //####################################################################################################################
   preload() {
-    // Load images and sprites
-    this.load.image('spaceship', '/assets/player_spaceship.png');
-    // Lasers ================================================
+    // == Laser Images ====================================================
     this.load.image('laser', '/assets/lasers/17.png');
-    this.load.audio('laserSound', '/assets/laser5.wav');
     this.load.image('redLaser', '/assets/lasers/02.png');
-    this.load.audio('redLaserSound', '/assets/laser4.wav');
     this.load.image('superLaser', '/assets/lasers/65.png');
+    // == Laser Sounds ====================================================
+    this.load.audio('laserSound', '/assets/laser5.wav');
+    this.load.audio('redLaserSound', '/assets/laser4.wav');
     this.load.audio('superLaserSound', '/assets/laser6.wav');
 
+    // == Ships ===========================================================
+    this.load.image('spaceship', '/assets/player_spaceship.png');
     this.load.image('alienSpaceship', '/assets/enemy_spaceship.png');
-    this.load.spritesheet('explosion', '/assets/explosions/explosion_1.png', { frameWidth: 256, frameHeight: 256 });
+
+    // == Misc Sounds ======================================================
     this.load.audio('explosionSound', '/assets/explosion.flac');
-    this.load.spritesheet('gemSprite', '/assets/powerup1.png', { frameWidth: 32, frameHeight: 32 });
     this.load.audio('gemSound', '/assets/power_up1.wav');
+
+    // == Particles ========================================================
     this.load.image('particleOne', '/assets/particle1.png');
     this.load.image('mainParticle', '/assets/particleStar.png');
+
+    // == Animations =======================================================
+    this.load.spritesheet('explosion', '/assets/explosions/explosion_1.png', { frameWidth: 256, frameHeight: 256 });
+    this.load.spritesheet('gemSprite', '/assets/powerup1.png', { frameWidth: 32, frameHeight: 32 });
   }
 
 
@@ -48,7 +55,9 @@ class GameScene extends Phaser.Scene {
   //####################################################################################################################
   create() {
     this.inputEnabled = true;  // Reset the input flag
+    // ==================
     // initialize classes
+    // ==================
     this.background      = new Background(this);
     this.alien           = new Alien(this);
     this.laser           = new Laser(this);
@@ -57,7 +66,10 @@ class GameScene extends Phaser.Scene {
     this.explosion       = new Explosion(this);
     this.scoreboard      = new Scoreboard(this);
     this.particleManager = new ParticleManager(this);
+
+    // ============================
     // Initialize arrays and groups
+    // ============================
     this.starsGraphics    = [];
     this.spaceship        = this.physics.add.sprite(this.scale.width / 2, this.scale.height / 2, 'spaceship').setScale(0.4);
     this.spaceshipSpeed   = 5;
@@ -65,47 +77,32 @@ class GameScene extends Phaser.Scene {
     this.alienSpaceships  = this.physics.add.group();
     this.cursors          = this.input.keyboard.createCursorKeys();
     this.inputHandler     = new InputHandler(this.input, this.cursors, this.spaceship, this.spaceshipSpeed);
-    this.collisionHandler = new CollisionHandler(this, this.laser, this.redLaser, this.superLaser, this.alien, this.spaceship,
-                                                  this.explosion, this.scoreboard, this.particleManager);
+    this.collisionHandler = new CollisionHandler(this, this.laser, this.redLaser, this.superLaser, this.alien,
+                                                 this.spaceship, this.explosion, this.scoreboard, this.particleManager);
   }
-
 
   //####################################################################################################################
   //#######  UPDATE  ###################################################################################################
   //####################################################################################################################
   update() {
-    if (!this.inputEnabled) {
-      return;  // Skip the rest of the update if input is disabled
-    }
-    // ==============
-    // Input Controls
-    // --------------
-    let dx = 0, dy = 0;  // Declare dx and dy here
-    const inputResult = this.inputHandler.handleInput();  // Get dx, dy from InputHandler
-    if (inputResult) {
-      dx = inputResult.dx;
-      dy = inputResult.dy;
-    }
-
-    // Update gem positions based on spaceship movement
-    if (dx !== 0 || dy !== 0) {
-      this.alien.gems.getChildren().forEach(gem => {
-        gem.x -= dy;
-        gem.y += dx;
-      });
-    }
-
-    if (dx !== 0 || dy !== 0) {
-      this.background.updateStars(dx, dy);     // Update star positions based on spaceship movement
-      this.explosion.updateExplosions(dx, dy); // Update positions of explosions
-    }
+    if (!this.inputEnabled) {return}  // Skip the rest of the update if input is disabled
+    this.inputHandler.handleInputAndUpdatePositions(this.alien, this.background, this.explosion);
     this.background.randomizeAlpha();
+    this.handleLasersAndDifficulty();
+    this.laser.destroyOffScreen();
+    this.alien.moveAliens(this.spaceship, this.spaceshipSpeed); // Handle alien spaceship movement
+    this.collisionHandler.handleCollisions();                   // Collision handling
+    this.collisionHandler.handleParticleCollisions();
+  }
 
-
-    // Get the current score from the Scoreboard class
-    const currentScore = this.scoreboard.getScore();
-
+  //####################################################################################################################
+  //####### HELPER METHODS  ############################################################################################
+  //####################################################################################################################
+  handleLasersAndDifficulty() {
+    // ==================================================================
     // Determine the number of aliens to spawn based on the current score
+    // ==================================================================
+    const currentScore = this.scoreboard.getScore();
     let numAliensToSpawn;
     let laserToFire;
 
@@ -134,12 +131,6 @@ class GameScene extends Phaser.Scene {
         this.alien.spawnAlien(this.scale.width, this.scale.height, currentScore);
       }
     }
-
-    this.laser.destroyOffScreen();
-    this.alien.moveAliens(this.spaceship, this.spaceshipSpeed); // Handle alien spaceship movement
-    this.collisionHandler.handleCollisions();                   // Collision handling
-    this.collisionHandler.handleParticleCollisions();
-
   }
 }
 export default GameScene;

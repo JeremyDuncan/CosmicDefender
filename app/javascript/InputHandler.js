@@ -26,6 +26,24 @@ class InputHandler {
     return { dx, dy };
   }
 
+  handleInputAndUpdatePositions(alien, background, explosion) {
+    let dx = 0, dy = 0;
+    const inputResult = this.handleInput();
+    if (inputResult) {
+      dx = inputResult.dx;
+      dy = inputResult.dy;
+    }
+
+    if (dx !== 0 || dy !== 0) {
+      alien.gems.getChildren().forEach(gem => {
+        gem.x -= dy;
+        gem.y += dx;
+      });
+      background.updateStars(dx, dy);
+      explosion.updateExplosions(dx, dy);
+    }
+  }
+
   getSpacebar() {
     return this.spacebar;
   }
