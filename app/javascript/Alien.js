@@ -5,14 +5,65 @@ class Alien {
   constructor(scene) {
     this.scene = scene;
     this.alienSpaceships = this.scene.physics.add.group();
+    this.gems = this.scene.physics.add.group();
+    // Create the gem animation
+    this.scene.anims.create({
+      key: 'gemAnim',
+      frames: this.scene.anims.generateFrameNumbers('gemSprite', { start: 0, end: 7 }),
+      frameRate: 10,
+      repeat: -1
+    });
+  }
+
+  // ==============================================================================
+  // Method to drop a gem at a given position (x, y)
+  // ------------------------------------------------------------------------------
+  dropGem(x, y) {
+    const gem = this.gems.create(x, y, 'gemSprite');
+    gem.setScale(1); // Set the scale as needed
+    gem.play('gemAnim'); // Play the animation
   }
 
 // ==============================================================================
-// Method to spawn an alien spaceship
-// The method ensures that the alien does not spawn too close to existing aliens
-// It also makes sure that aliens can spawn from all directions
+// Method to set the speed of an alien spaceship based on the current score
 // ------------------------------------------------------------------------------
-  spawnAlien(gameWidth, gameHeight) {
+  setAlienSpeed(alienSpaceship, currentScore) {
+    let speed;
+    if (currentScore < 100) {
+      speed = Phaser.Math.Between(100, 150);
+    } else if (currentScore < 200) {
+      speed = Phaser.Math.Between(100, 200);
+    } else if (currentScore < 300) {
+      speed = Phaser.Math.Between(200, 300);
+    } else if (currentScore < 500) {
+      speed = Phaser.Math.Between(200, 300);
+    } else if (currentScore < 700) {
+      speed = Phaser.Math.Between(200, 300);
+    } else if (currentScore < 900) {
+      speed = Phaser.Math.Between(200, 300);
+    } else if (currentScore < 1100) {
+      speed = Phaser.Math.Between(220, 330);
+    } else if (currentScore < 1300) {
+      speed = Phaser.Math.Between(240, 300);
+    } else if (currentScore < 1500) {
+      speed = Phaser.Math.Between(300, 300);
+    } else if (currentScore < 5000) {
+      speed = Phaser.Math.Between(400, 500);
+    } else if (currentScore < 9500) {
+      speed = Phaser.Math.Between(500, 600);
+    }
+    else {
+      speed = Phaser.Math.Between(300, 900);
+    }
+    alienSpaceship.randomVelocity = speed;
+  }
+
+  // ==============================================================================
+  // Method to spawn an alien spaceship
+  // The method ensures that the alien does not spawn too close to existing aliens
+  // It also makes sure that aliens can spawn from all directions
+  // ------------------------------------------------------------------------------
+  spawnAlien(gameWidth, gameHeight, currentScore) {
     let attempts = 0;
     let x, y;
     let tooClose;
@@ -50,7 +101,9 @@ class Alien {
     if (!tooClose) {
       const alienSpaceship = this.alienSpaceships.create(x, y, 'alienSpaceship');
       alienSpaceship.setScale(0.05);
-      alienSpaceship.randomVelocity = Phaser.Math.Between(30, 190);
+      this.setAlienSpeed(alienSpaceship, currentScore);
+
+      // alienSpaceship.randomVelocity = Phaser.Math.Between(30, 190);
 
     }
   }

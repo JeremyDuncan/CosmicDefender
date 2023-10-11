@@ -1,10 +1,16 @@
-// Importing required classes
-import Alien        from './Alien';
-import Background   from './Background';
-import Laser        from './Laser';
-import Explosion    from './Explosion';
-import Scoreboard   from './Scoreboard';
-import InputHandler from './InputHandler';
+//####################################################################################################################
+//#######  IMPORT CLASSES  ###########################################################################################
+//####################################################################################################################
+import Alien            from './Alien';
+import Background       from './Background';
+import Laser            from './Laser';
+import RedLaser         from './RedLaser';
+import SuperLaser       from './SuperLaser';
+import Explosion        from './Explosion';
+import Scoreboard       from './Scoreboard';
+import InputHandler     from './InputHandler';
+import CollisionHandler from './CollisionHandler';
+import ParticleManager  from './ParticleManager';
 
 class GameScene extends Phaser.Scene {
   constructor() {
@@ -13,62 +19,60 @@ class GameScene extends Phaser.Scene {
     this.inputEnabled = true;  // Add this line
   }
 
+  //####################################################################################################################
+  //#######  PRELOAD  ##################################################################################################
+  //####################################################################################################################
   preload() {
     // Load images and sprites
     this.load.image('spaceship', '/assets/player_spaceship.png');
+    // Lasers ================================================
     this.load.image('laser', '/assets/lasers/17.png');
+    this.load.audio('laserSound', '/assets/laser5.wav');
+    this.load.image('redLaser', '/assets/lasers/02.png');
+    this.load.audio('redLaserSound', '/assets/laser4.wav');
+    this.load.image('superLaser', '/assets/lasers/65.png');
+    this.load.audio('superLaserSound', '/assets/laser6.wav');
+
     this.load.image('alienSpaceship', '/assets/enemy_spaceship.png');
     this.load.spritesheet('explosion', '/assets/explosions/explosion_1.png', { frameWidth: 256, frameHeight: 256 });
+    this.load.audio('explosionSound', '/assets/explosion.flac');
+    this.load.spritesheet('gemSprite', '/assets/powerup1.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.audio('gemSound', '/assets/power_up1.wav');
+    this.load.image('particleOne', '/assets/particle1.png');
+    this.load.image('mainParticle', '/assets/particleStar.png');
   }
 
+
+  //####################################################################################################################
+  //#######  CREATE  ###################################################################################################
+  //####################################################################################################################
   create() {
     this.inputEnabled = true;  // Reset the input flag
-
-    // nitialize classes
-    this.background = new Background(this);
-    this.alien = new Alien(this);
-    this.laser = new Laser(this);
-    this.explosion = new Explosion(this);
-    this.scoreboard = new Scoreboard(this);
-
+    // initialize classes
+    this.background      = new Background(this);
+    this.alien           = new Alien(this);
+    this.laser           = new Laser(this);
+    this.redLaser        = new RedLaser(this);
+    this.superLaser      = new SuperLaser(this);
+    this.explosion       = new Explosion(this);
+    this.scoreboard      = new Scoreboard(this);
+    this.particleManager = new ParticleManager(this);
     // Initialize arrays and groups
-    this.starsGraphics = [];
-    this.spaceship = this.physics.add.sprite(this.scale.width / 2, this.scale.height / 2, 'spaceship');
-    this.spaceship.setScale(0.4);
-    this.spaceshipSpeed = 5;
-    this.lasers = this.physics.add.group();
-    this.alienSpaceships = this.physics.add.group();
-
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.inputHandler = new InputHandler(this.input, this.cursors, this.spaceship, this.spaceshipSpeed);  // Initialize the InputHandler class
-
-
-    // Create a text object for the "Game Over" message but set it to be invisible initially
-    this.gameOverText = this.add.text(this.scale.width / 2, this.scale.height / 2, 'Game Over', {
-      fontSize: '64px',
-      fill: '#ff0000'
-    }).setOrigin(0.5).setVisible(false);
-
-    // ==============================================================================
-    // Create a text object for the "Retry" button but set it to be invisible initially
-    // ------------------------------------------------------------------------------
-    this.retryText = this.add.text(this.scale.width / 2, this.scale.height / 2 + 80, 'Retry', {
-      fontSize: '32px',
-      fill: '#00ff00'
-    }).setOrigin(0.5).setVisible(false).setInteractive();
-
-    // Add a click event to the "Retry" text
-    this.retryText.on('pointerdown', () => this.retryGame());
+    this.starsGraphics    = [];
+    this.spaceship        = this.physics.add.sprite(this.scale.width / 2, this.scale.height / 2, 'spaceship').setScale(0.4);
+    this.spaceshipSpeed   = 5;
+    this.lasers           = this.physics.add.group();
+    this.alienSpaceships  = this.physics.add.group();
+    this.cursors          = this.input.keyboard.createCursorKeys();
+    this.inputHandler     = new InputHandler(this.input, this.cursors, this.spaceship, this.spaceshipSpeed);
+    this.collisionHandler = new CollisionHandler(this, this.laser, this.redLaser, this.superLaser, this.alien, this.spaceship,
+                                                  this.explosion, this.scoreboard, this.particleManager);
   }
 
-  // ==========================
-  // Method to restart the game
-  // --------------------------
-  retryGame() {
-    console.log("RESTART")
-    this.scene.start('GameScene');  // Start a new instance of the GameScene
-  }
 
+  //####################################################################################################################
+  //#######  UPDATE  ###################################################################################################
+  //####################################################################################################################
   update() {
     if (!this.inputEnabled) {
       return;  // Skip the rest of the update if input is disabled
@@ -82,53 +86,60 @@ class GameScene extends Phaser.Scene {
       dx = inputResult.dx;
       dy = inputResult.dy;
     }
+
+    // Update gem positions based on spaceship movement
+    if (dx !== 0 || dy !== 0) {
+      this.alien.gems.getChildren().forEach(gem => {
+        gem.x -= dy;
+        gem.y += dx;
+      });
+    }
+
     if (dx !== 0 || dy !== 0) {
       this.background.updateStars(dx, dy);     // Update star positions based on spaceship movement
       this.explosion.updateExplosions(dx, dy); // Update positions of explosions
     }
-
     this.background.randomizeAlpha();
-    this.laser.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
-    this.laser.destroyOffScreen();
+
+
+    // Get the current score from the Scoreboard class
+    const currentScore = this.scoreboard.getScore();
+
+    // Determine the number of aliens to spawn based on the current score
+    let numAliensToSpawn;
+    let laserToFire;
+
+    if (currentScore < 500) {
+      numAliensToSpawn = 1;
+      laserToFire = this.redLaser;
+      laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+    } else if (currentScore < 1500) {
+      numAliensToSpawn = 2;
+      const shouldFire = Phaser.Input.Keyboard.JustDown(this.inputHandler.getSpacebar());
+      laserToFire = this.laser;
+      laserToFire.fire(shouldFire, this.spaceship, this.spaceship.angle);
+    } else if (currentScore < 9500) {
+      numAliensToSpawn = 6;
+      laserToFire = this.superLaser;
+      laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+    } else {
+      numAliensToSpawn = 15;
+      laserToFire = this.superLaser;
+      laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+    }
 
     // Handle alien spaceship spawning
     if (Phaser.Math.Between(0, 100) > 95) {
-      this.alien.spawnAlien(this.scale.width, this.scale.height);
-      this.alien.spawnAlien(this.scale.width, this.scale.height);
-      this.alien.spawnAlien(this.scale.width, this.scale.height);
+      for (let i = 0; i < numAliensToSpawn; i++) {
+        this.alien.spawnAlien(this.scale.width, this.scale.height, currentScore);
+      }
     }
 
-    // Handle alien spaceship movement
-    this.alien.moveAliens(this.spaceship, this.spaceshipSpeed);
+    this.laser.destroyOffScreen();
+    this.alien.moveAliens(this.spaceship, this.spaceshipSpeed); // Handle alien spaceship movement
+    this.collisionHandler.handleCollisions();                   // Collision handling
+    this.collisionHandler.handleParticleCollisions();
 
-    // Collision handling between lasers and alien spaceships
-    this.physics.overlap(this.laser.getLasers(), this.alien.getAlienSpaceships(), (laser, alienSpaceship) => {
-      laser.destroy();
-      alienSpaceship.destroy();
-
-      // Create an explosion at the collision point
-      this.explosion.createExplosion(alienSpaceship.x, alienSpaceship.y);
-      this.scoreboard.updateScore(10);
-    });
-
-    // Handle collisions between the player's spaceship and alien spaceships
-    this.physics.overlap(this.spaceship, this.alien.getAlienSpaceships(), (spaceship, alienSpaceship) => {
-      // Create explosions for both the alien and the player
-      this.explosion.createExplosion(alienSpaceship.x, alienSpaceship.y);
-      this.explosion.createExplosion(spaceship.x, spaceship.y);
-
-      alienSpaceship.destroy();
-      spaceship.destroy();
-
-      this.inputEnabled = false;  // Disable input
-      // Pause the scene after a delay
-      this.time.delayedCall(2000, () => {
-        this.scene.pause();
-        this.scene.launch('GameOverScene');
-      });
-    });
   }
 }
-
-// Export the GameScene class for use in other files
 export default GameScene;

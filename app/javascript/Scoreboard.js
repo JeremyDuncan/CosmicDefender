@@ -8,6 +8,13 @@ class Scoreboard {
     });
   }
 
+  // =================================
+  // Function to get the current score
+  // ---------------------------------
+  getScore() {
+    return this.score;
+  }
+
   // ===============================================
   // Function to update player score in the database
   // -----------------------------------------------
