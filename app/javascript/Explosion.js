@@ -3,6 +3,7 @@ class Explosion {
   constructor(scene) {
     this.scene = scene;
     this.explosions = this.scene.add.group();
+    this.explosionSound = this.scene.sound.add('explosionSound');
 
     // Define the explosion animation
     this.scene.anims.create({
@@ -18,6 +19,8 @@ class Explosion {
     const explosion = this.scene.add.sprite(x, y, 'explosion');
     explosion.play('explode');
     this.explosions.add(explosion);
+    this.explosionSound.play();  // Add this line to play the sound
+
   }
 
   updateExplosions(dx, dy) {
