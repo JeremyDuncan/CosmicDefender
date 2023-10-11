@@ -129,6 +129,8 @@ class GameScene extends Phaser.Scene {
     }
     this.alien.moveAliens(this.spaceship, this.spaceshipSpeed); // Handle alien spaceship movement
     this.collisionHandler.handleCollisions();                   // Collision handling
+    this.collisionHandler.handleParticleCollisions();
+
   }
 }
 export default GameScene;

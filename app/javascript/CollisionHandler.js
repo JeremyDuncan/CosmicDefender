@@ -84,4 +84,16 @@ export default class CollisionHandler {
       }, [], this);  // Bind `this` to the callback
     });
   }
+
+  // ==============================================================================
+// Add this method to your CollisionHandler class to handle particle collisions
+// ------------------------------------------------------------------------------
+  handleParticleCollisions() {
+    this.scene.physics.overlap(this.particleManager.getParticles(), this.alien.getAlienSpaceships(), (particle, alienSpaceship) => {
+      alienSpaceship.destroy();
+      this.explosion.createExplosion(alienSpaceship.x, alienSpaceship.y);
+      particle.destroy();
+      this.scoreboard.updateScore(5);
+    });
+  }
 }

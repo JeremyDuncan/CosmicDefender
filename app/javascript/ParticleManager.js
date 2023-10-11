@@ -1,6 +1,7 @@
 export default class ParticleManager {
   constructor(scene) {
     this.scene = scene;
+    this.particleGroup = this.scene.physics.add.group();  // Create a physics group for particles
 
     this.emitter = this.scene.add.particles(100, 300, 'particleOne', {
       angle: { min: -5, max: 3305 },
@@ -33,9 +34,17 @@ export default class ParticleManager {
   startEmitter(emitterName, x, y) {
     this[emitterName].setPosition(x, y);
     this[emitterName].start();
-  }
 
+    // Add emitted particles to the physics group
+    const particle = this.scene.physics.add.sprite(x, y, 'mainParticle');
+    particle.setDepth(-1);  // Set the depth to be below the player's ship
+    this.particleGroup.add(particle);
+  }
   stopEmitter(emitterName) {
     this[emitterName].stop();
+  }
+  // Method to expose the particle group
+  getParticles() {
+    return this.particleGroup;
   }
 }
