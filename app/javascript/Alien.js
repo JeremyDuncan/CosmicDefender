@@ -5,6 +5,24 @@ class Alien {
   constructor(scene) {
     this.scene = scene;
     this.alienSpaceships = this.scene.physics.add.group();
+    this.gems = this.scene.physics.add.group();
+    // Create the gem animation
+    this.scene.anims.create({
+      key: 'gemAnim',
+      frames: this.scene.anims.generateFrameNumbers('gemSprite', { start: 0, end: 7 }),
+      frameRate: 10,
+      repeat: -1
+    });
+  }
+
+
+  // ==============================================================================
+  // Method to drop a gem at a given position (x, y)
+  // ------------------------------------------------------------------------------
+  dropGem(x, y) {
+    const gem = this.gems.create(x, y, 'gemSprite');
+    gem.setScale(1); // Set the scale as needed
+    gem.play('gemAnim'); // Play the animation
   }
 
 // ==============================================================================
