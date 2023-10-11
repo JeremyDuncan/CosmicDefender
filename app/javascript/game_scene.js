@@ -112,12 +112,20 @@ class GameScene extends Phaser.Scene {
     if (currentScore < 500) {
       numAliensToSpawn = 1;
       laserToFire = this.redLaser;
+      laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
     } else if (currentScore < 1500) {
       numAliensToSpawn = 2;
+      const shouldFire = Phaser.Input.Keyboard.JustDown(this.inputHandler.getSpacebar());
       laserToFire = this.laser;
-    } else {
+      laserToFire.fire(shouldFire, this.spaceship, this.spaceship.angle);
+    } else if (currentScore < 9500) {
       numAliensToSpawn = 6;
       laserToFire = this.superLaser;
+      laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+    } else {
+      numAliensToSpawn = 15;
+      laserToFire = this.superLaser;
+      laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
     }
 
     // Handle alien spaceship spawning
@@ -127,11 +135,7 @@ class GameScene extends Phaser.Scene {
       }
     }
 
-    // Fire the appropriate laser
-    laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
-
     this.laser.destroyOffScreen();
-
     this.alien.moveAliens(this.spaceship, this.spaceshipSpeed); // Handle alien spaceship movement
     this.collisionHandler.handleCollisions();                   // Collision handling
     this.collisionHandler.handleParticleCollisions();

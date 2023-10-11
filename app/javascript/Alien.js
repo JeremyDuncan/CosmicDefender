@@ -47,8 +47,13 @@ class Alien {
       speed = Phaser.Math.Between(240, 300);
     } else if (currentScore < 1500) {
       speed = Phaser.Math.Between(300, 300);
-    } else {
-      speed = Phaser.Math.Between(300, 400);
+    } else if (currentScore < 5000) {
+      speed = Phaser.Math.Between(400, 500);
+    } else if (currentScore < 9500) {
+      speed = Phaser.Math.Between(500, 600);
+    }
+    else {
+      speed = Phaser.Math.Between(300, 900);
     }
     alienSpaceship.randomVelocity = speed;
   }

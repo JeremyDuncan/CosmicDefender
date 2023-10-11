@@ -12,7 +12,10 @@ export default class RedLaser extends Laser {
   // Method to fire a red laser
   // ------------------------------------------------------------------------------
   fire(spacebar, spaceship, angle) {
-    // You can override the fire method here if needed, or call the parent method
-    super.fire(spacebar, spaceship, angle, this.laserType, this.laserSound);
+    const shouldFire = Phaser.Input.Keyboard.JustDown(spacebar);
+    if (shouldFire) {
+      // You can override the fire method here if needed, or call the parent method
+      super.fire(spacebar, spaceship, angle, this.laserType, this.laserSound);
+    }
   }
 }

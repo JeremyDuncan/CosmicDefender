@@ -89,15 +89,59 @@ input[type="submit"] {
     border-radius: 5px;
     transition: background-color 0.3s ease;
 }
-
-/* Hover effect */
 button#start-button:hover,
 input[type="submit"]:hover {
     background-color: #008800;
 }
-
-/* Active click effect */
 button#start-button:active,
 input[type="submit"]:active {
+    background-color: #006600;
+}
+.center-screen {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 200px;
+}
+.form-label {
+    width:400px;
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+}
+.form-input {
+    font-size: 1.2em;
+    padding: 0.5em;
+    width: 100%;
+}
+.btn {
+    margin-top: 1em;
+}
+#title {
+    text-align: center;
+}
+button.btn {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: #00ff00;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+button.btn:hover {
+    background-color: #008800;
+}
+
+button.btn:active {
     background-color: #006600;
 }

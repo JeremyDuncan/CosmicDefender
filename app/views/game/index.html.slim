@@ -1,34 +1,41 @@
 canvas#starfield
 h1#title Cosmic Defender
-button#start-button Start Game
+button#start-button
+  i.fa-brands.fa-space-awesome
+  | &nbsp
+  |Start Game
+
 div#player-prompt style="display:none;"
 
-    / ###################################################
-    / ## FORM ##
-    / ##########
-    = form_with url: '/save_player', method: :post, id: 'player-form', local: false, html: { class: 'form-container' } do |form|
-        div.form-container
-            .container.col.reduce.round
-                = form.label :name, 'Enter your name:', class: 'form-label'
-                = form.text_field :name, id: 'player-name', class: 'form-input'
-            / ########### SUBMIT BUTTON ###################
-            = form.submit 'Continue', id: 'continue-button', class: 'btn'
+  / ###################################################
+  / ## FORM ##
+  / ##########
+  = form_with url: '/save_player', method: :post, id: 'player-form', local: false, html: { class: 'form-container' } do |form|
+    div.form-container
+      .container.col.reduce.round
+        = form.label :name, 'Enter your name:', class: 'form-label'
+        = form.text_field :name, id: 'player-name', class: 'form-input'
+      / ########### SUBMIT BUTTON ###################
+      = button_tag type: 'submit', id: 'continue-button', class: 'btn' do
+        i.fa-solid.fa-user-astronaut
+        | &nbsp
+        | Continue
 
 div#high-scores-prompt
-    = render partial: "player_scores", locals: { players: @players }
+  = render partial: "player_scores", locals: { players: @players }
 div#game-container
 div#player-name-display
 
 audio#audio-player loop="loop" style="display:none;"
-    source src=asset_path("intro.mp3") type="audio/mp3"
+  source src=asset_path("intro.mp3") type="audio/mp3"
 
 /#########################################################
 /## MODAL SECTION ##
 /###################
 div#nameModal.modal
-    div.modal-content
-        span.close-button &times;
-        p Please enter your name to continue.
+  div.modal-content
+    span.close-button &times;
+    p Please enter your name to continue.
 
 
 javascript:
@@ -93,6 +100,8 @@ javascript:
             $('#player-prompt').show();
             $('#start-button').hide();
             $('#high-scores-prompt').hide();
+            // Add the center-screen class to center the title
+            $('#title').addClass('center-screen');
         });
 
         // Get the modal and the close button

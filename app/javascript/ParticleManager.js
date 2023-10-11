@@ -14,11 +14,13 @@ export default class ParticleManager {
 
     this.mainEmitter = this.scene.add.particles(100, 300, 'mainParticle', {
       angle: { min: -5, max: 365 },
-      speed: 300,
-      alpha: { start: .3, end: .1 },
+      speed: 3100,
+      alpha: { start: .2, end: 0 },
       scale: { start: .2, end: .0 },
-      quantity: 5,
-      blendMode: 'normal'
+      quantity: 1,
+      blendMode: 'normal',
+      lifespan: 200  // 200 milliseconds
+
     }).setPosition(0, 0).stop();
 
     this.secondEmitter = this.scene.add.particles(100, 300, 'mainParticle', {

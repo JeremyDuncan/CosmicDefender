@@ -8,13 +8,14 @@ export default class Laser {
 // ==============================================================================
 // Method to fire a laser
 // ------------------------------------------------------------------------------
-  fire(spacebar, spaceship, angle, laserType = 'laser', laserSound = null) {
-    if (Phaser.Input.Keyboard.JustDown(spacebar)) {
-      const angleInRad  = Phaser.Math.DegToRad(angle - 90);
+  fire(shouldFire, spaceship, angle, laserType = 'laser', laserSound = null, offsetX = 0, offsetY = 0, spreadAngle = 0) {
+    if (shouldFire) {
+      const adjustedAngle = angle + spreadAngle;
+      const angleInRad  = Phaser.Math.DegToRad(adjustedAngle - 90);
       const dx          = Math.cos(angleInRad);
       const dy          = Math.sin(angleInRad);
-      const laserStartX = spaceship.x + 20 * dx;
-      const laserStartY = spaceship.y + 20 * dy;
+      const laserStartX = spaceship.x + 20 * dx + offsetX;
+      const laserStartY = spaceship.y + 20 * dy + offsetY;
       const laser       = this.lasers.create(laserStartX, laserStartY, laserType);  // Use laserType here
 
       laser.setScale(0.5);
