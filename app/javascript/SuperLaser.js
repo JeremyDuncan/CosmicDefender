@@ -8,11 +8,17 @@ export default class SuperLaser extends Laser {
     this.laserSound = this.scene.sound.add('superLaserSound');
   }
 
-  // ==============================================================================
-  // Method to fire a Super laser
-  // ------------------------------------------------------------------------------
   fire(spacebar, spaceship, angle) {
-    // You can override the fire method here if needed, or call the parent method
-    super.fire(spacebar, spaceship, angle, this.laserType, this.laserSound);
+    const shouldFire = Phaser.Input.Keyboard.JustDown(spacebar);
+    if (shouldFire) {
+      // Fire the central laser
+      super.fire(true, spaceship, angle, this.laserType, this.laserSound);
+      // Fire the left laser with a -10 degree spread
+      super.fire(true, spaceship, angle, this.laserType, this.laserSound, 0, 0, -10);
+      // Fire the right laser with a +10 degree spread
+      super.fire(true, spaceship, angle, this.laserType, this.laserSound, 0, 0, 10);
+      // Fire the backward laser
+      super.fire(true, spaceship, angle + 180, this.laserType, this.laserSound);
+    }
   }
 }
