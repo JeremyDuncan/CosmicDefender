@@ -1,10 +1,13 @@
 // Importing required classes
-import Alien        from './Alien';
-import Background   from './Background';
-import Laser        from './Laser';
-import Explosion    from './Explosion';
-import Scoreboard   from './Scoreboard';
-import InputHandler from './InputHandler';
+import Alien            from './Alien';
+import Background       from './Background';
+import Laser            from './Laser';
+import RedLaser         from './RedLaser';
+import Explosion        from './Explosion';
+import Scoreboard       from './Scoreboard';
+import InputHandler     from './InputHandler';
+import CollisionHandler from './CollisionHandler';
+import ParticleManager  from './ParticleManager';
 
 class GameScene extends Phaser.Scene {
   constructor() {
@@ -16,20 +19,31 @@ class GameScene extends Phaser.Scene {
   preload() {
     // Load images and sprites
     this.load.image('spaceship', '/assets/player_spaceship.png');
+    // Lasers ================================================
     this.load.image('laser', '/assets/lasers/17.png');
+    this.load.audio('laserOneSound', '/assets/laser.wav');
+    this.load.image('redLaser', '/assets/lasers/02.png');
+    this.load.audio('redLaserSound', '/assets/laser4.wav');
     this.load.image('alienSpaceship', '/assets/enemy_spaceship.png');
     this.load.spritesheet('explosion', '/assets/explosions/explosion_1.png', { frameWidth: 256, frameHeight: 256 });
+    this.load.audio('explosionSound', '/assets/explosion.flac');
+    this.load.spritesheet('gemSprite', '/assets/powerup1.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.audio('gemSound', '/assets/power_up1.wav');
+    this.load.image('particleOne', '/assets/particle1.png');
+    this.load.image('mainParticle', '/assets/particleStar.png');
   }
 
   create() {
     this.inputEnabled = true;  // Reset the input flag
 
-    // nitialize classes
-    this.background = new Background(this);
-    this.alien = new Alien(this);
-    this.laser = new Laser(this);
-    this.explosion = new Explosion(this);
-    this.scoreboard = new Scoreboard(this);
+    // initialize classes
+    this.background      = new Background(this);
+    this.alien           = new Alien(this);
+    this.laser           = new Laser(this);
+    this.redLaser        = new RedLaser(this);
+    this.explosion       = new Explosion(this);
+    this.scoreboard      = new Scoreboard(this);
+    this.particleManager = new ParticleManager(this);  // <-- Initialize here
 
     // Initialize arrays and groups
     this.starsGraphics = [];
@@ -40,7 +54,9 @@ class GameScene extends Phaser.Scene {
     this.alienSpaceships = this.physics.add.group();
 
     this.cursors = this.input.keyboard.createCursorKeys();
-    this.inputHandler = new InputHandler(this.input, this.cursors, this.spaceship, this.spaceshipSpeed);  // Initialize the InputHandler class
+    this.inputHandler = new InputHandler(this.input, this.cursors, this.spaceship, this.spaceshipSpeed);
+    this.collisionHandler = new CollisionHandler(this, this.laser, this.redLaser, this.alien, this.spaceship,
+                                                  this.explosion, this.scoreboard, this.particleManager);
 
 
     // Create a text object for the "Game Over" message but set it to be invisible initially
@@ -82,13 +98,27 @@ class GameScene extends Phaser.Scene {
       dx = inputResult.dx;
       dy = inputResult.dy;
     }
+
+    // Update gem positions based on spaceship movement
+    if (dx !== 0 || dy !== 0) {
+      this.alien.gems.getChildren().forEach(gem => {
+        gem.x -= dy;
+        gem.y += dx;
+      });
+    }
+
     if (dx !== 0 || dy !== 0) {
       this.background.updateStars(dx, dy);     // Update star positions based on spaceship movement
       this.explosion.updateExplosions(dx, dy); // Update positions of explosions
     }
 
     this.background.randomizeAlpha();
-    this.laser.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+    if (true) {
+      this.redLaser.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+    } else {
+      this.laser.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+    }
+
     this.laser.destroyOffScreen();
 
     // Handle alien spaceship spawning
@@ -97,38 +127,8 @@ class GameScene extends Phaser.Scene {
       this.alien.spawnAlien(this.scale.width, this.scale.height);
       this.alien.spawnAlien(this.scale.width, this.scale.height);
     }
-
-    // Handle alien spaceship movement
-    this.alien.moveAliens(this.spaceship, this.spaceshipSpeed);
-
-    // Collision handling between lasers and alien spaceships
-    this.physics.overlap(this.laser.getLasers(), this.alien.getAlienSpaceships(), (laser, alienSpaceship) => {
-      laser.destroy();
-      alienSpaceship.destroy();
-
-      // Create an explosion at the collision point
-      this.explosion.createExplosion(alienSpaceship.x, alienSpaceship.y);
-      this.scoreboard.updateScore(10);
-    });
-
-    // Handle collisions between the player's spaceship and alien spaceships
-    this.physics.overlap(this.spaceship, this.alien.getAlienSpaceships(), (spaceship, alienSpaceship) => {
-      // Create explosions for both the alien and the player
-      this.explosion.createExplosion(alienSpaceship.x, alienSpaceship.y);
-      this.explosion.createExplosion(spaceship.x, spaceship.y);
-
-      alienSpaceship.destroy();
-      spaceship.destroy();
-
-      this.inputEnabled = false;  // Disable input
-      // Pause the scene after a delay
-      this.time.delayedCall(2000, () => {
-        this.scene.pause();
-        this.scene.launch('GameOverScene');
-      });
-    });
+    this.alien.moveAliens(this.spaceship, this.spaceshipSpeed); // Handle alien spaceship movement
+    this.collisionHandler.handleCollisions();                   // Collision handling
   }
 }
-
-// Export the GameScene class for use in other files
 export default GameScene;
