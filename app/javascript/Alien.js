@@ -15,7 +15,6 @@ class Alien {
     });
   }
 
-
   // ==============================================================================
   // Method to drop a gem at a given position (x, y)
   // ------------------------------------------------------------------------------
@@ -26,11 +25,40 @@ class Alien {
   }
 
 // ==============================================================================
-// Method to spawn an alien spaceship
-// The method ensures that the alien does not spawn too close to existing aliens
-// It also makes sure that aliens can spawn from all directions
+// Method to set the speed of an alien spaceship based on the current score
 // ------------------------------------------------------------------------------
-  spawnAlien(gameWidth, gameHeight) {
+  setAlienSpeed(alienSpaceship, currentScore) {
+    let speed;
+    if (currentScore < 100) {
+      speed = Phaser.Math.Between(100, 150);
+    } else if (currentScore < 200) {
+      speed = Phaser.Math.Between(100, 200);
+    } else if (currentScore < 300) {
+      speed = Phaser.Math.Between(200, 300);
+    } else if (currentScore < 500) {
+      speed = Phaser.Math.Between(200, 300);
+    } else if (currentScore < 700) {
+      speed = Phaser.Math.Between(200, 300);
+    } else if (currentScore < 900) {
+      speed = Phaser.Math.Between(200, 300);
+    } else if (currentScore < 1100) {
+      speed = Phaser.Math.Between(220, 330);
+    } else if (currentScore < 1300) {
+      speed = Phaser.Math.Between(240, 300);
+    } else if (currentScore < 1500) {
+      speed = Phaser.Math.Between(300, 300);
+    } else {
+      speed = Phaser.Math.Between(300, 400);
+    }
+    alienSpaceship.randomVelocity = speed;
+  }
+
+  // ==============================================================================
+  // Method to spawn an alien spaceship
+  // The method ensures that the alien does not spawn too close to existing aliens
+  // It also makes sure that aliens can spawn from all directions
+  // ------------------------------------------------------------------------------
+  spawnAlien(gameWidth, gameHeight, currentScore) {
     let attempts = 0;
     let x, y;
     let tooClose;
@@ -68,7 +96,9 @@ class Alien {
     if (!tooClose) {
       const alienSpaceship = this.alienSpaceships.create(x, y, 'alienSpaceship');
       alienSpaceship.setScale(0.05);
-      alienSpaceship.randomVelocity = Phaser.Math.Between(30, 190);
+      this.setAlienSpeed(alienSpaceship, currentScore);
+
+      // alienSpaceship.randomVelocity = Phaser.Math.Between(30, 190);
 
     }
   }

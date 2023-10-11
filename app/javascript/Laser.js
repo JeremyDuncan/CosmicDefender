@@ -2,7 +2,7 @@ export default class Laser {
   constructor(scene) {
     this.scene      = scene;
     this.lasers     = this.scene.physics.add.group();
-    this.laserSound = this.scene.sound.add('laserOneSound');
+    this.laserSound = this.scene.sound.add('laserSound');
   }
 
 // ==============================================================================
@@ -23,6 +23,9 @@ export default class Laser {
       laser.setDepth(spaceship.depth - 1);
       if (laserSound) {
         laserSound.play({ volume: 0.5 });
+      } else {
+        // Play the default laser sound if no specific sound is provided
+        this.laserSound.play({ volume: 0.5 });
       }
     }
   }
