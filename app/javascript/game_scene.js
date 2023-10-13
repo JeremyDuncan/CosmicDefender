@@ -103,27 +103,24 @@ class GameScene extends Phaser.Scene {
     // ==================================================================
     // Determine the number of aliens to spawn based on the current score
     // ==================================================================
-    const currentScore = this.scoreboard.getScore();
-    let numAliensToSpawn;
-    let laserToFire;
+    const currentScore        = this.scoreboard.getScore();      // Get score from database
+    const shouldFireFromTouch = this.inputHandler.shouldFire;    // Touch Input
+    const spacebar            = this.inputHandler.getSpacebar(); // Spacebar Input
+    let   numAliensToSpawn;
 
     if (currentScore < 500) {
       numAliensToSpawn = 1;
-      laserToFire = this.redLaser;
-      laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+      this.redLaser.fire(shouldFireFromTouch, spacebar, this.spaceship, this.spaceship.angle);
     } else if (currentScore < 1500) {
       numAliensToSpawn = 2;
-      const shouldFire = Phaser.Input.Keyboard.JustDown(this.inputHandler.getSpacebar());
-      laserToFire = this.laser;
-      laserToFire.fire(shouldFire, this.spaceship, this.spaceship.angle);
+      const shouldFireFromSpaceBar = Phaser.Input.Keyboard.JustDown(this.inputHandler.getSpacebar());
+      this.laser.fire(shouldFireFromTouch, shouldFireFromSpaceBar, this.spaceship, this.spaceship.angle);
     } else if (currentScore < 9500) {
       numAliensToSpawn = 6;
-      laserToFire = this.superLaser;
-      laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+      this.superLaser.fire(shouldFireFromTouch, spacebar, this.spaceship, this.spaceship.angle);
     } else {
       numAliensToSpawn = 15;
-      laserToFire = this.superLaser;
-      laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+      this.superLaser.fire(shouldFireFromTouch, spacebar, this.spaceship, this.spaceship.angle);
     }
 
     // Handle alien spaceship spawning

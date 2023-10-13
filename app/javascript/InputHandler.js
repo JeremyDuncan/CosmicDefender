@@ -13,6 +13,7 @@ class InputHandler {
     this.input.on('pointerup', this.onTouchEnd.bind(this));     // Handles touch stop
     this.input.on('pointermove', this.onTouchMove.bind(this));  // Handles touch tracking
     this.moveForward = false; // Flag to indicate whether the spaceship should move forward
+    this.shouldFire  = false; // Flag to indicate whether to fire
   }
 
   onTouchStart(pointer) {
@@ -22,9 +23,11 @@ class InputHandler {
     );
     this.spaceship.angle = Phaser.Math.RadToDeg(angleInRad) + 90;
     this.moveForward = true;
+    this.shouldFire  = true;
   }
   onTouchEnd() {
     this.moveForward = false;
+    this.shouldFire  = false;
   }
 
   onTouchMove(pointer) {

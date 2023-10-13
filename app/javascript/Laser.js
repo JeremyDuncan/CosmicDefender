@@ -8,8 +8,8 @@ export default class Laser {
 // ==============================================================================
 // Method to fire a laser
 // ------------------------------------------------------------------------------
-  fire(shouldFire, spaceship, angle, laserType = 'laser', laserSound = null, offsetX = 0, offsetY = 0, spreadAngle = 0) {
-    if (shouldFire) {
+  fire(shouldFireFromTouch ,shouldFireFromSpaceBar, spaceship, angle, laserType = 'laser', laserSound = null, offsetX = 0, offsetY = 0, spreadAngle = 0) {
+    if (shouldFireFromSpaceBar || shouldFireFromTouch) {
       const adjustedAngle = angle + spreadAngle;
       const angleInRad  = Phaser.Math.DegToRad(adjustedAngle - 90);
       const dx          = Math.cos(angleInRad);

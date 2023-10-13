@@ -1,6 +1,4 @@
-// RedLaser.js
 import Laser from './Laser';
-
 export default class SuperLaser extends Laser {
   constructor(scene) {
     super(scene);
@@ -8,17 +6,17 @@ export default class SuperLaser extends Laser {
     this.laserSound = this.scene.sound.add('superLaserSound');
   }
 
-  fire(spacebar, spaceship, angle) {
-    const shouldFire = Phaser.Input.Keyboard.JustDown(spacebar);
-    if (shouldFire) {
+  fire(shouldFireFromTouch, spacebar, spaceship, angle) {
+    const shouldFireFromKeyboard = Phaser.Input.Keyboard.JustDown(spacebar);
+    if (shouldFireFromTouch || shouldFireFromKeyboard) {
       // Fire the central laser
-      super.fire(true, spaceship, angle, this.laserType, this.laserSound);
+      super.fire(shouldFireFromTouch,spacebar, spaceship, angle, this.laserType, this.laserSound);
       // Fire the left laser with a -10 degree spread
-      super.fire(true, spaceship, angle, this.laserType, this.laserSound, 0, 0, -10);
+      super.fire(shouldFireFromTouch,spacebar, spaceship, angle, this.laserType, this.laserSound, 0, 0, -10);
       // Fire the right laser with a +10 degree spread
-      super.fire(true, spaceship, angle, this.laserType, this.laserSound, 0, 0, 10);
+      super.fire(shouldFireFromTouch,spacebar, spaceship, angle, this.laserType, this.laserSound, 0, 0, 10);
       // Fire the backward laser
-      super.fire(true, spaceship, angle + 180, this.laserType, this.laserSound);
+      super.fire(shouldFireFromTouch,spacebar, spaceship, angle + 180, this.laserType, this.laserSound);
     }
   }
 }
