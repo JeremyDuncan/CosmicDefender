@@ -3,13 +3,26 @@ export default class Laser {
     this.scene      = scene;
     this.lasers     = this.scene.physics.add.group();
     this.laserSound = this.scene.sound.add('laserSound');
+    this.lastFired  = 0;   // Keep track of the last time a laser was fired
+    this.fireDelay  = 200; // Delay in milliseconds between each laser fire when using touch
   }
 
-// ==============================================================================
-// Method to fire a laser
-// ------------------------------------------------------------------------------
-  fire(shouldFireFromTouch ,shouldFireFromSpaceBar, spaceship, angle, laserType = 'laser', laserSound = null, offsetX = 0, offsetY = 0, spreadAngle = 0) {
+  // ==============================================================================
+  // Method to fire a laser
+  // ------------------------------------------------------------------------------
+  fire(shouldFireFromTouch, shouldFireFromSpaceBar, spaceship, angle, laserType = 'laser', laserSound = null, offsetX = 0, offsetY = 0, spreadAngle = 0) {
+    const currentTime = this.scene.time.now;  // Get the current time
+
+    // ==========================================================================
+    // Check if enough time has passed since the last laser was fired (for touch)
+    // --------------------------------------------------------------------------
+    if (shouldFireFromTouch && currentTime - this.lastFired < this.fireDelay) {
+      return;
+    }
+
     if (shouldFireFromSpaceBar || shouldFireFromTouch) {
+      this.lastFired = currentTime;  // Update the lastFired time
+
       const adjustedAngle = angle + spreadAngle;
       const angleInRad  = Phaser.Math.DegToRad(adjustedAngle - 90);
       const dx          = Math.cos(angleInRad);
@@ -30,7 +43,6 @@ export default class Laser {
       }
     }
   }
-
 
   // ==============================================================================
   // Method to destroy lasers that go off-screen
