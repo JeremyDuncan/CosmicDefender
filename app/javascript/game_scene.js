@@ -85,14 +85,15 @@ class GameScene extends Phaser.Scene {
   //#######  UPDATE  ###################################################################################################
   //####################################################################################################################
   update() {
-    if (!this.inputEnabled) {return}  // Skip the rest of the update if input is disabled
-    this.inputHandler.handleInputAndUpdatePositions(this.alien, this.background, this.explosion);
-    this.background.randomizeAlpha();
-    this.handleLasersAndDifficulty();
-    this.laser.destroyOffScreen();
-    this.alien.moveAliens(this.spaceship, this.spaceshipSpeed); // Handle alien spaceship movement
-    this.collisionHandler.handleCollisions();                   // Collision handling
-    this.collisionHandler.handleParticleCollisions();
+    if (!this.inputEnabled) {return} // Skip the rest of the update if input is disabled
+    this.inputHandler.handleInputAndUpdatePositions(this.alien, this.background, this.explosion); //makes sure everything moves relative to each other
+    this.background.randomizeAlpha();                                        // Makes blinky stars
+    this.handleLasersAndDifficulty();                                        // updates lasers based on score
+    this.laser.destroyOffScreen();                                           // removes lasers once they leave the screen
+    const moveForward = this.inputHandler.moveForward;                       // Get Touch signal to move forward
+    this.alien.moveAliens(this.spaceship, this.spaceshipSpeed, moveForward); // Handle alien spaceship movement
+    this.collisionHandler.handleCollisions();                                // Ship and laser Collision handling
+    this.collisionHandler.handleParticleCollisions();                        // Particle Collision handling
   }
 
   //####################################################################################################################

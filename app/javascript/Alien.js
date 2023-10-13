@@ -109,7 +109,7 @@ class Alien {
   }
 
 
-  moveAliens(spaceship, spaceshipSpeed) {
+  moveAliens(spaceship, spaceshipSpeed, moveForward) {
     this.alienSpaceships.getChildren().forEach(alienSpaceship => {
       const angleToPlayer = Phaser.Math.Angle.Between(
         alienSpaceship.x, alienSpaceship.y,
@@ -122,7 +122,7 @@ class Alien {
         velocity * Math.sin(angleToPlayer)
       );
 
-      if (this.scene.cursors.up.isDown) {
+      if (this.scene.cursors.up.isDown || moveForward) {
         const angleInRad = Phaser.Math.DegToRad(spaceship.angle);
         const dx = spaceshipSpeed * Math.cos(angleInRad);
         const dy = spaceshipSpeed * Math.sin(angleInRad);
