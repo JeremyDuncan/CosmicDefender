@@ -1,17 +1,18 @@
 canvas#starfield
-h1#title Cosmic Defender
 button#start-button
   i.fa-brands.fa-space-awesome
   | &nbsp
   |Start Game
 
 div#player-prompt style="display:none;"
-
   / ###################################################
   / ## FORM ##
   / ##########
   = form_with url: '/save_player', method: :post, id: 'player-form', local: false, html: { class: 'form-container' } do |form|
     div.form-container
+      .title
+        h1
+          | Cosmic Defender
       .container.col.reduce.round
         = form.label :name, 'Enter your name:', class: 'form-label'
         = form.text_field :name, id: 'player-name', class: 'form-input'
@@ -37,9 +38,24 @@ div#nameModal.modal
     span.close-button &times;
     p Please enter your name to continue.
 
-
 javascript:
     $(document).ready(function () {
+        function adjustLayout() {
+            if ($(window).width() <= 768) {
+                // Adjust layout for small screens
+                $('#title').css('font-size', '24px');
+                $('.form-container').css('width', '100%');
+            } else {
+                // Reset to default styles for larger screens
+                $('#title').css('font-size', '');
+                $('.form-container').css('width', '');
+            }
+        }
+
+
+
+
+
         // Play the audio when the user moves the mouse over the body
         document.body.addEventListener('mousemove', function playAudioOnce() {
             const audio = document.getElementById('audio-player');
@@ -57,10 +73,28 @@ javascript:
         const ctx = canvas.getContext('2d');
         let stars = [];
 
+        // function resizeCanvas() {
+        //     canvas.width = $(window).width();
+        //     canvas.height = $(window).height();
+        // }
+
+
         function resizeCanvas() {
-            canvas.width = $(window).width();
-            canvas.height = $(window).height();
+            const aspectRatio = 16 / 9; // You can change this to fit your game's aspect ratio
+            let newWidth = $(window).width();
+            let newHeight = $(window).height();
+
+            // Make sure the canvas maintains its aspect ratio
+            if (newWidth / newHeight > aspectRatio) {
+                newWidth = newHeight * aspectRatio;
+            } else {
+                newHeight = newWidth / aspectRatio;
+            }
+
+            canvas.width = newWidth;
+            canvas.height = newHeight;
         }
+
 
         function createStars() {
             for (let i = 0; i < 100; i++) {
@@ -138,7 +172,9 @@ javascript:
         resizeCanvas();
         createStars();
         animate();
-
+        // Call adjustLayout on page load and window resize
+        adjustLayout();
+        $(window).resize(adjustLayout);
         // Handle window resize
-        $(window).resize(resizeCanvas);
+        // $(window).resize(resizeCanvas);
     });

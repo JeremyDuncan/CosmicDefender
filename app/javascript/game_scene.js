@@ -11,12 +11,14 @@ import Scoreboard       from './Scoreboard';
 import InputHandler     from './InputHandler';
 import CollisionHandler from './CollisionHandler';
 import ParticleManager  from './ParticleManager';
+import VirtualGamepad   from './VirtualGamepad';
 
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
     this.score = 0;
     this.inputEnabled = true;
+    this.speedScalingFactor = 1; // Initialize to 1, will be updated in create()
   }
 
   //####################################################################################################################
@@ -66,33 +68,47 @@ class GameScene extends Phaser.Scene {
     this.explosion       = new Explosion(this);
     this.scoreboard      = new Scoreboard(this);
     this.particleManager = new ParticleManager(this);
+    this.virtualGamepad  = new VirtualGamepad(this);
 
     // ============================
     // Initialize arrays and groups
     // ============================
     this.starsGraphics    = [];
-    this.spaceship        = this.physics.add.sprite(this.scale.width / 2, this.scale.height / 2, 'spaceship').setScale(0.4);
-    this.spaceshipSpeed   = 5;
+
+    // Set the initial scale of the spaceship based on the screen size
+    const gameWidth = this.scale.width;
+    const gameHeight = this.scale.height;
+    const isMobile = gameWidth < 800; // Adjust this value based on what you consider "mobile"
+    const initialScale = isMobile ? Math.min(0.4 * (gameWidth / 800), 0.4 * (gameHeight / 600)) : 0.4;
+    this.spaceship = this.physics.add.sprite(gameWidth / 2, gameHeight / 2, 'spaceship').setScale(initialScale);
+    // Update speed scaling factor
+    this.speedScalingFactor = isMobile ? 0.5 : 1;
+
+    this.spaceshipSpeed = 5 * this.speedScalingFactor; // Update spaceship speed
     this.lasers           = this.physics.add.group();
     this.alienSpaceships  = this.physics.add.group();
     this.cursors          = this.input.keyboard.createCursorKeys();
     this.inputHandler     = new InputHandler(this.input, this.cursors, this.spaceship, this.spaceshipSpeed);
     this.collisionHandler = new CollisionHandler(this, this.laser, this.redLaser, this.superLaser, this.alien,
                                                  this.spaceship, this.explosion, this.scoreboard, this.particleManager);
+    // Listen for the resize event
+    this.scale.on('resize', this.handleResize, this);
   }
 
   //####################################################################################################################
   //#######  UPDATE  ###################################################################################################
   //####################################################################################################################
   update() {
-    if (!this.inputEnabled) {return}  // Skip the rest of the update if input is disabled
-    this.inputHandler.handleInputAndUpdatePositions(this.alien, this.background, this.explosion);
-    this.background.randomizeAlpha();
-    this.handleLasersAndDifficulty();
-    this.laser.destroyOffScreen();
-    this.alien.moveAliens(this.spaceship, this.spaceshipSpeed); // Handle alien spaceship movement
-    this.collisionHandler.handleCollisions();                   // Collision handling
-    this.collisionHandler.handleParticleCollisions();
+    if (!this.inputEnabled) {return} // Skip the rest of the update if input is disabled
+    this.virtualGamepad.update();
+    this.inputHandler.handleInputAndUpdatePositions(this.alien, this.background, this.explosion); //makes sure everything moves relative to each other
+    this.background.randomizeAlpha();                                        // Makes blinky stars
+    this.handleLasersAndDifficulty();                                        // updates lasers based on score
+    this.laser.destroyOffScreen();                                           // removes lasers once they leave the screen
+    const moveForward = this.inputHandler.moveForward;                       // Get Touch signal to move forward
+    this.alien.moveAliens(this.spaceship, this.spaceshipSpeed, moveForward); // Handle alien spaceship movement
+    this.collisionHandler.handleCollisions();                                // Ship and laser Collision handling
+    this.collisionHandler.handleParticleCollisions();                        // Particle Collision handling
   }
 
   //####################################################################################################################
@@ -102,27 +118,24 @@ class GameScene extends Phaser.Scene {
     // ==================================================================
     // Determine the number of aliens to spawn based on the current score
     // ==================================================================
-    const currentScore = this.scoreboard.getScore();
-    let numAliensToSpawn;
-    let laserToFire;
+    const currentScore        = this.scoreboard.getScore();      // Get score from database
+    const shouldFireFromTouch = this.inputHandler.shouldFire;    // Touch Input
+    const spacebar            = this.inputHandler.getSpacebar(); // Spacebar Input
+    let   numAliensToSpawn;
 
     if (currentScore < 500) {
       numAliensToSpawn = 1;
-      laserToFire = this.redLaser;
-      laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+      this.redLaser.fire(shouldFireFromTouch, spacebar, this.spaceship, this.spaceship.angle);
     } else if (currentScore < 1500) {
       numAliensToSpawn = 2;
-      const shouldFire = Phaser.Input.Keyboard.JustDown(this.inputHandler.getSpacebar());
-      laserToFire = this.laser;
-      laserToFire.fire(shouldFire, this.spaceship, this.spaceship.angle);
+      const shouldFireFromSpaceBar = Phaser.Input.Keyboard.JustDown(this.inputHandler.getSpacebar());
+      this.laser.fire(shouldFireFromTouch, shouldFireFromSpaceBar, this.spaceship, this.spaceship.angle);
     } else if (currentScore < 9500) {
       numAliensToSpawn = 6;
-      laserToFire = this.superLaser;
-      laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+      this.superLaser.fire(shouldFireFromTouch, spacebar, this.spaceship, this.spaceship.angle);
     } else {
       numAliensToSpawn = 15;
-      laserToFire = this.superLaser;
-      laserToFire.fire(this.inputHandler.getSpacebar(), this.spaceship, this.spaceship.angle);
+      this.superLaser.fire(shouldFireFromTouch, spacebar, this.spaceship, this.spaceship.angle);
     }
 
     // Handle alien spaceship spawning
@@ -132,5 +145,19 @@ class GameScene extends Phaser.Scene {
       }
     }
   }
+
+  // ==============================================================================
+  // Method to handle the resize event
+  // ------------------------------------------------------------------------------
+  handleResize(gameSize, baseSize, displaySize, resolution) {
+    const width = gameSize.width;
+    const height = gameSize.height;
+    const isMobile = width < 800; // Adjust this value based on what you consider "mobile"
+
+    // Update the scale of the spaceship based on the new dimensions
+    const newScale = isMobile ? Math.min(0.4 * (width / 800), 0.4 * (height / 600)) : 0.4;
+    this.spaceship.setScale(newScale);
+  }
+
 }
 export default GameScene;
