@@ -11,6 +11,7 @@ import Scoreboard       from './Scoreboard';
 import InputHandler     from './InputHandler';
 import CollisionHandler from './CollisionHandler';
 import ParticleManager  from './ParticleManager';
+import VirtualGamepad   from './VirtualGamepad';
 
 class GameScene extends Phaser.Scene {
   constructor() {
@@ -98,6 +99,7 @@ class GameScene extends Phaser.Scene {
   //####################################################################################################################
   update() {
     if (!this.inputEnabled) {return} // Skip the rest of the update if input is disabled
+    this.virtualGamepad.update();
     this.inputHandler.handleInputAndUpdatePositions(this.alien, this.background, this.explosion); //makes sure everything moves relative to each other
     this.background.randomizeAlpha();                                        // Makes blinky stars
     this.handleLasersAndDifficulty();                                        // updates lasers based on score

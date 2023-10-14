@@ -5,6 +5,7 @@ class InputHandler {
     this.spaceship      = spaceship;
     this.spaceshipSpeed = spaceshipSpeed;
     this.spacebar       = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.isDpadActive   = false;
 
     // =====================
     // Touch event listeners
@@ -17,6 +18,7 @@ class InputHandler {
   }
 
   onTouchStart(pointer) {
+    if (this.isDpadActive) return;
     const angleInRad = Phaser.Math.Angle.Between(
       this.spaceship.x, this.spaceship.y,
       pointer.x, pointer.y
@@ -26,11 +28,13 @@ class InputHandler {
     this.shouldFire  = true;
   }
   onTouchEnd() {
+    if (this.isDpadActive) return;
     this.moveForward = false;
     this.shouldFire  = false;
   }
 
   onTouchMove(pointer) {
+    if (this.isDpadActive) return;
     if (this.moveForward) {
       const angleInRad = Phaser.Math.Angle.Between(
         this.spaceship.x, this.spaceship.y,
@@ -38,6 +42,12 @@ class InputHandler {
       );
       this.spaceship.angle = Phaser.Math.RadToDeg(angleInRad) + 90;
     }
+  }
+
+  setDpadActive(isActive) {
+    this.isDpadActive = isActive;
+    this.moveForward = true;
+    this.shouldFire  = true;
   }
 
   handleInput() {
@@ -58,10 +68,9 @@ class InputHandler {
     return { dx, dy };
   }
 
-  handleInputAndUpdatePositions(alien, background, explosion) {
-    let dx = 0, dy = 0;
-    const inputResult = this.handleInput();
-    if (inputResult) {
+  handleInputAndUpdatePositions(alien, background, explosion, dx = 0, dy = 0) {
+    if (dx === 0 && dy === 0) {
+      const inputResult = this.handleInput();
       dx = inputResult.dx;
       dy = inputResult.dy;
     }
