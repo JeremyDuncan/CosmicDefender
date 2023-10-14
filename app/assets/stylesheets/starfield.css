@@ -32,22 +32,20 @@ input[type="submit"] {
     border: none;
     cursor: pointer;
 }
-
 div#player-prompt,
 div#high-scores-prompt {
     text-align: center;
 }
-
-
 #high-scores-prompt table {
     width: 50%;
     border-collapse: separate;
     border-spacing: 0;
-    background-color: rgba(255, 255, 255, 0.6); /* Semi-transparent background */
-    border-radius: 12px; /* Rounded corners */
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
     overflow: hidden;
-    margin: 0 auto; /* Center the table */
-
+    margin: 0 auto;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 #high-scores-prompt th,
@@ -70,8 +68,8 @@ div#high-scores-prompt {
     align-items: center;
 }
 #high-scores-prompt tr:hover {
-    background-color: rgba(0, 255, 0, 0.3); /* Green background on hover */
-    cursor: pointer; /* Change cursor to pointer on hover */
+    background-color: rgba(0, 255, 0, 0.3);
+    cursor: pointer;
 }
 
 #high-scores-prompt tr:active {
@@ -99,7 +97,7 @@ input[type="submit"]:active {
 }
 .center-screen {
     position: fixed;
-    top: 30%;
+    top: 20%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
@@ -109,7 +107,6 @@ input[type="submit"]:active {
     align-items: center;
     justify-content: center;
     width: 100%;
-    margin-top: 200px;
 }
 .form-label {
     width:400px;
@@ -145,3 +142,5 @@ button.btn:hover {
 button.btn:active {
     background-color: #006600;
 }
+body {margin-top: 50px !important}
+#player-form {margin: 0px}
