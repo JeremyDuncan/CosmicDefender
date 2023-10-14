@@ -68,6 +68,7 @@ class GameScene extends Phaser.Scene {
     this.explosion       = new Explosion(this);
     this.scoreboard      = new Scoreboard(this);
     this.particleManager = new ParticleManager(this);
+    this.virtualGamepad  = new VirtualGamepad(this);
 
     // ============================
     // Initialize arrays and groups
