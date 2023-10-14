@@ -16,16 +16,16 @@ class TitleScene extends Phaser.Scene {
     const centerX    = this.scale.width / 2;
     const centerY    = this.scale.height / 2;
     this.background  = new Background(this);
+    const baseFontSize = this.scale.width < 768 ? 16 : 32; // Determine font size based on screen width
 
-
-    const title = this.add.text(centerX, centerY - 100, 'Cosmic Defender', { fontSize: '32px', fill: '#fff' });
+    const title = this.add.text(centerX, centerY - 80, 'Cosmic Defender', { fontSize: `${baseFontSize + 5}px`, fill: '#fff', fontWeight: 'bold'});
     title.setOrigin(0.5);
 
     // Display the player name
-    const welcomeText = this.add.text(centerX, centerY, `Welcome ${playerName}`, { fontSize: '24px', fill: '#fff' });
+    const welcomeText = this.add.text(centerX, centerY - 40, `Welcome ${playerName}`, { fontSize: `${baseFontSize - 10}px`, fill: '#fff' });
     welcomeText.setOrigin(0.5);
 
-    const startButton = this.add.text(centerX, centerY + 100, 'Start Game', { fontSize: '32px', fill: '#fff' });
+    const startButton = this.add.text(centerX, centerY , 'Start Game', { fontSize: `${baseFontSize + 5}px`, fill: '#1a7e04', fontWeight: 'bold' });
     startButton.setOrigin(0.5);
     startButton.setInteractive();
     startButton.on('pointerdown', () => this.scene.start('GameScene'));  // No need to pass playerName here
