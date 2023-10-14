@@ -63,7 +63,8 @@ function initializeGame(playerName, playerId) {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
       width: window.innerWidth,
-      height: window.innerHeight
+      height: window.innerHeight,
+      orientation: Phaser.Scale.Orientation.LANDSCAPE
     },
     scene: [TitleScene, GameScene, HighScoreScene, GameOverScene],  // Add GameOverScene here
     physics: {
