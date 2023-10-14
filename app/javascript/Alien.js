@@ -4,6 +4,7 @@
 class Alien {
   constructor(scene) {
     this.scene = scene;
+    this.scene.scale.on('resize', this.handleResize, this); // Listen for the resize event
     this.alienSpaceships = this.scene.physics.add.group();
     this.gems = this.scene.physics.add.group();
     // Create the gem animation
@@ -12,6 +13,21 @@ class Alien {
       frames: this.scene.anims.generateFrameNumbers('gemSprite', { start: 0, end: 7 }),
       frameRate: 10,
       repeat: -1
+    });
+  }
+
+  // ==============================================================================
+  // Method to handle the resize event
+  // ------------------------------------------------------------------------------
+  handleResize(gameSize, baseSize, displaySize, resolution) {
+    const width = gameSize.width;
+    const height = gameSize.height;
+    const isMobile = width < 800; // Adjust this value based on what you consider "mobile"
+
+    // Update the scale of alienSpaceships based on the new dimensions
+    this.alienSpaceships.getChildren().forEach(alienSpaceship => {
+      const newScale = isMobile ? Math.min(0.05 * (width / 800), 0.05 * (height / 600)) : 0.05;
+      alienSpaceship.setScale(newScale);
     });
   }
 
@@ -26,6 +42,7 @@ class Alien {
 
 // ==============================================================================
 // Method to set the speed of an alien spaceship based on the current score
+// and scale it using the speedScalingFactor from the scene.
 // ------------------------------------------------------------------------------
   setAlienSpeed(alienSpaceship, currentScore) {
     let speed;
@@ -51,10 +68,15 @@ class Alien {
       speed = Phaser.Math.Between(400, 500);
     } else if (currentScore < 9500) {
       speed = Phaser.Math.Between(500, 600);
-    }
-    else {
+    } else {
       speed = Phaser.Math.Between(300, 900);
     }
+
+    // Apply the scaling factor if it exists
+    if (this.scene.speedScalingFactor) {
+      speed *= (.5 * this.scene.speedScalingFactor);
+    }
+
     alienSpaceship.randomVelocity = speed;
   }
 
@@ -100,11 +122,12 @@ class Alien {
 
     if (!tooClose) {
       const alienSpaceship = this.alienSpaceships.create(x, y, 'alienSpaceship');
-      alienSpaceship.setScale(0.05);
+      // Set the initial scale based on the screen size
+      const isMobile = gameWidth < 800; // Adjust this value based on what you consider "mobile"
+      const initialScale = isMobile ? Math.min(0.05 * (gameWidth / 800), 0.05 * (gameHeight / 600)) : 0.05;
+
+      alienSpaceship.setScale(initialScale);
       this.setAlienSpeed(alienSpaceship, currentScore);
-
-      // alienSpaceship.randomVelocity = Phaser.Math.Between(30, 190);
-
     }
   }
 

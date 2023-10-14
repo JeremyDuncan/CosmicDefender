@@ -78,6 +78,9 @@ function initializeGame(playerName, playerId) {
   // Initialize the game with the config
   const game = new Phaser.Game(config);
 
+  // Lock the orientation to landscape
+  game.scale.lockOrientation('landscape');
+
   // Set playerName as a global variable
   game.registry.set('playerName', playerName);
   game.registry.set('playerId', playerId);
