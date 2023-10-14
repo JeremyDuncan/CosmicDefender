@@ -38,6 +38,14 @@ div#nameModal.modal
     span.close-button &times;
     p Please enter your name to continue.
 
+#rotateMessage
+    div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+        .jet-icon-wrapper
+            i.fa-brands.fa-space-awesome
+            .jet-blast
+        p style="margin-top: 30px"Please rotate your device to landscape mode to play the game.
+        i.fa-solid.fa-sync-alt
+
 javascript:
     $(document).ready(function () {
         function adjustLayout() {
@@ -52,10 +60,6 @@ javascript:
             }
         }
 
-
-
-
-
         // Play the audio when the user moves the mouse over the body
         document.body.addEventListener('mousemove', function playAudioOnce() {
             const audio = document.getElementById('audio-player');
@@ -68,16 +72,9 @@ javascript:
         });
 
         let animateStars = true;  // Add this flag to control the animation
-
-        const canvas = $('#starfield')[0];
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-
-        // function resizeCanvas() {
-        //     canvas.width = $(window).width();
-        //     canvas.height = $(window).height();
-        // }
-
+        const canvas     = $('#starfield')[0];
+        const ctx        = canvas.getContext('2d');
+        let stars        = [];
 
         function resizeCanvas() {
             const aspectRatio = 16 / 9; // You can change this to fit your game's aspect ratio
@@ -90,11 +87,9 @@ javascript:
             } else {
                 newHeight = newWidth / aspectRatio;
             }
-
             canvas.width = newWidth;
             canvas.height = newHeight;
         }
-
 
         function createStars() {
             for (let i = 0; i < 100; i++) {
@@ -175,6 +170,25 @@ javascript:
         // Call adjustLayout on page load and window resize
         adjustLayout();
         $(window).resize(adjustLayout);
-        // Handle window resize
-        // $(window).resize(resizeCanvas);
+
+        // Create a function to handle orientation changes
+        function handleOrientation() {
+            if (window.innerWidth > 768) {
+                $('#rotateMessage').hide(); // Hide the modal on computer screens
+                return; // Exit the function early
+            }
+            if (window.orientation === 90 || window.orientation === -90) {
+                // Landscape
+                $('#rotateMessage').hide(); // Hide the modal
+            } else {
+                // Portrait
+                $('#rotateMessage').show(); // Show the modal
+            }
+        }
+
+        // Initialize orientation handling
+        handleOrientation();
+
+        // Listen for orientation changes
+        window.addEventListener("orientationchange", handleOrientation, false);
     });
