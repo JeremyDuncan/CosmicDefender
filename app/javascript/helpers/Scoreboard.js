@@ -37,14 +37,12 @@ class Scoreboard {
     }
   }
 
+  // ================
   // update the score
+  // ----------------
   async updateScore(points) {
     this.score += points;
     this.scoreText.setText(`Score: ${this.score}`);
-
-    // Save the updated score to the database
-    const playerId = this.scene.registry.get('playerId');
-    await this.updatePlayerScoreInDB(playerId)
   }
 }
 export default Scoreboard;
