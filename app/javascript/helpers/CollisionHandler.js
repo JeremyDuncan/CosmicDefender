@@ -86,11 +86,14 @@ export default class CollisionHandler {
       // Create explosions for both the alien and the player
       this.explosion.createExplosion(alienSpaceship.x, alienSpaceship.y);
       this.explosion.createExplosion(spaceship.x, spaceship.y);
-      alienSpaceship.destroy();
-      spaceship.destroy();
-
+      alienSpaceship.destroy();         // Destroy Alien Ship
+      spaceship.destroy();              // Destroy Player Ship
+      this.saveScore()                  // Save Score
       this.scene.inputEnabled = false;  // Disable input
+
+      // =============================
       // Pause the scene after a delay
+      // -----------------------------
       this.scene.time.delayedCall(2000, () => {
         if (this.scene && this.scene.scene && typeof this.scene.scene.pause === 'function') {
           this.scene.scene.pause();
@@ -99,6 +102,18 @@ export default class CollisionHandler {
         }
       }, [], this);  // Bind `this` to the callback
     });
+  }
+
+  // ====================================
+  // Save the final score to the database
+  // ------------------------------------
+  saveScore() {
+    const scoreboard = this.scene.scoreboard;
+    const playerId   = this.scene.registry.get('playerId');
+    scoreboard.updatePlayerScoreInDB(playerId)
+      .then(() => {}).catch((error) => {
+        console.error('There was a problem updating the score:', error);
+      });
   }
 
   // ==========================
