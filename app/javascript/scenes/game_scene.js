@@ -1,7 +1,8 @@
 //####################################################################################################################
 //#######  IMPORT CLASSES  ###########################################################################################
 //####################################################################################################################
-import Alien            from '../aliens/Alien';
+import Alien            from '.././spaceships/Alien';
+import PlayerSpaceship  from '.././spaceships/PlayerSpaceship';
 import Background       from '../helpers/Background';
 import Laser            from '../lasers/Laser';
 import RedLaser         from '../lasers/RedLaser';
@@ -16,8 +17,8 @@ import VirtualGamepad   from '../helpers/VirtualGamepad';
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
-    this.score = 0;
-    this.inputEnabled = true;
+    this.score              = 0;
+    this.inputEnabled       = true;
     this.speedScalingFactor = 1; // Initialize to 1, will be updated in create()
   }
 
@@ -69,30 +70,24 @@ class GameScene extends Phaser.Scene {
     this.scoreboard      = new Scoreboard(this);
     this.particleManager = new ParticleManager(this);
     this.virtualGamepad  = new VirtualGamepad(this);
+    // ==========================
+    // Initialize PlayerSpaceship
+    // --------------------------
+    this.playerSpaceship = new PlayerSpaceship(this);
+    this.spaceship       = this.playerSpaceship.getSpaceship();
+    this.spaceshipSpeed  = this.playerSpaceship.getSpeed();
 
     // ============================
     // Initialize arrays and groups
     // ============================
-    this.starsGraphics    = [];
-
-    // Set the initial scale of the spaceship based on the screen size
-    const gameWidth = this.scale.width;
-    const gameHeight = this.scale.height;
-    const isMobile = gameWidth < 800; // Adjust this value based on what you consider "mobile"
-    const initialScale = isMobile ? Math.min(0.4 * (gameWidth / 800), 0.4 * (gameHeight / 600)) : 0.4;
-    this.spaceship = this.physics.add.sprite(gameWidth / 2, gameHeight / 2, 'spaceship').setScale(initialScale);
-    // Update speed scaling factor
-    this.speedScalingFactor = isMobile ? 0.5 : 1;
-
-    this.spaceshipSpeed = 5 * this.speedScalingFactor; // Update spaceship speed
-    this.lasers           = this.physics.add.group();
-    this.alienSpaceships  = this.physics.add.group();
-    this.cursors          = this.input.keyboard.createCursorKeys();
-    this.inputHandler     = new InputHandler(this.input, this.cursors, this.spaceship, this.spaceshipSpeed);
-    this.collisionHandler = new CollisionHandler(this, this.laser, this.redLaser, this.superLaser, this.alien,
+    this.starsGraphics      = [];
+    this.lasers             = this.physics.add.group();
+    this.alienSpaceships    = this.physics.add.group();
+    this.cursors            = this.input.keyboard.createCursorKeys();
+    this.inputHandler       = new InputHandler(this.input, this.cursors, this.spaceship, this.spaceshipSpeed);
+    this.collisionHandler   = new CollisionHandler(this, this.laser, this.redLaser, this.superLaser, this.alien,
                                                  this.spaceship, this.explosion, this.scoreboard, this.particleManager);
-    // Listen for the resize event
-    this.scale.on('resize', this.handleResize, this);
+    this.scale.on('resize', this.handleResize, this); // Listen for the resize event
   }
 
   //####################################################################################################################
@@ -150,13 +145,14 @@ class GameScene extends Phaser.Scene {
   // Method to handle the resize event
   // ------------------------------------------------------------------------------
   handleResize(gameSize, baseSize, displaySize, resolution) {
-    const width = gameSize.width;
-    const height = gameSize.height;
+    const width    = gameSize.width;
+    const height   = gameSize.height;
     const isMobile = width < 800; // Adjust this value based on what you consider "mobile"
 
     // Update the scale of the spaceship based on the new dimensions
     const newScale = isMobile ? Math.min(0.4 * (width / 800), 0.4 * (height / 600)) : 0.4;
     this.spaceship.setScale(newScale);
+    this.playerSpaceship.handleResize(gameSize);
   }
 
 }
