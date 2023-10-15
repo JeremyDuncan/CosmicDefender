@@ -1,7 +1,7 @@
 import Phaser        from 'phaser';
-import GameScene     from './game_scene';
-import GameOverScene from './game_over_scene';
-import Background    from './Background';
+import GameScene     from './scenes/game_scene';
+import GameOverScene from './scenes/game_over_scene';
+import Background    from './helpers/Background';
 
 // ==============================================================================
 // TitleScene class

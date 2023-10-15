@@ -1,17 +1,17 @@
 //####################################################################################################################
 //#######  IMPORT CLASSES  ###########################################################################################
 //####################################################################################################################
-import Alien            from './Alien';
-import Background       from './Background';
-import Laser            from './Laser';
-import RedLaser         from './RedLaser';
-import SuperLaser       from './SuperLaser';
-import Explosion        from './Explosion';
-import Scoreboard       from './Scoreboard';
-import InputHandler     from './InputHandler';
-import CollisionHandler from './CollisionHandler';
-import ParticleManager  from './ParticleManager';
-import VirtualGamepad   from './VirtualGamepad';
+import Alien            from '../aliens/Alien';
+import Background       from '../helpers/Background';
+import Laser            from '../lasers/Laser';
+import RedLaser         from '../lasers/RedLaser';
+import SuperLaser       from '../lasers/SuperLaser';
+import Explosion        from '../helpers/Explosion';
+import Scoreboard       from '../helpers/Scoreboard';
+import InputHandler     from '../helpers/InputHandler';
+import CollisionHandler from '../helpers/CollisionHandler';
+import ParticleManager  from '../helpers/ParticleManager';
+import VirtualGamepad   from '../helpers/VirtualGamepad';
 
 class GameScene extends Phaser.Scene {
   constructor() {
