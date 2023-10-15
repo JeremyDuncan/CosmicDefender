@@ -23,7 +23,9 @@ services:
       RAILS_ENV: development #=> Change this to development
       RACK_ENV: development  #=> Change this to development
       DATABASE_URL: "postgresql://postgres:mysecretpassword@db:5432/CosmicDefender_development"
-      GAME_API_PORT: "https://cosmicdefender.jeremyduncan.synology.me/"
+      GAME_API_PORT: "https://cosmicdefender.jeremyd.net/"
+#      GAME_API_PORT: "https://cosmicdefender.jeremyduncan.synology.me/"
+
 
 volumes:
   postgres_data:
