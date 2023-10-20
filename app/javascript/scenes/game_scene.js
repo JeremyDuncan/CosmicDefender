@@ -30,6 +30,7 @@ class GameScene extends Phaser.Scene {
     this.load.image('laser', '/assets/lasers/17.png');
     this.load.image('redLaser', '/assets/lasers/02.png');
     this.load.image('superLaser', '/assets/lasers/65.png');
+
     // == Laser Sounds ====================================================
     this.load.audio('laserSound', '/assets/laser5.wav');
     this.load.audio('redLaserSound', '/assets/laser4.wav');
@@ -42,6 +43,7 @@ class GameScene extends Phaser.Scene {
     // == Misc Sounds ======================================================
     this.load.audio('explosionSound', '/assets/explosion.flac');
     this.load.audio('gemSound', '/assets/power_up1.wav');
+    this.load.audio('jetThrustSound', '/assets/jet_thrust.mp3');
 
     // == Particles ========================================================
     this.load.image('particleOne', '/assets/particle1.png');
@@ -84,7 +86,7 @@ class GameScene extends Phaser.Scene {
     this.lasers             = this.physics.add.group();
     this.alienSpaceships    = this.physics.add.group();
     this.cursors            = this.input.keyboard.createCursorKeys();
-    this.inputHandler       = new InputHandler(this.input, this.cursors, this.spaceship, this.spaceshipSpeed);
+    this.inputHandler       = new InputHandler(this, this.input, this.cursors, this.spaceship, this.spaceshipSpeed, this.particleManager);
     this.collisionHandler   = new CollisionHandler(this, this.laser, this.redLaser, this.superLaser, this.alien,
                                                  this.spaceship, this.explosion, this.scoreboard, this.particleManager);
     this.scale.on('resize', this.handleResize, this); // Listen for the resize event

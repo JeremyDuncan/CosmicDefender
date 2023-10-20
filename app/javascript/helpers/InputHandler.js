@@ -1,11 +1,14 @@
 class InputHandler {
-  constructor(input, cursors, spaceship, spaceshipSpeed) {
+  constructor(scene, input, cursors, spaceship, spaceshipSpeed, particleManager) {
+    this.scene          = scene;
     this.input          = input;
     this.cursors        = cursors;
     this.spaceship      = spaceship;
     this.spaceshipSpeed = spaceshipSpeed;
     this.spacebar       = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.isDpadActive   = false;
+    this.jetThrustSound = this.scene.sound.add('jetThrustSound');
+    this.isSoundPlaying = false;
 
     // =====================
     // Touch event listeners
@@ -15,6 +18,7 @@ class InputHandler {
     this.input.on('pointermove', this.onTouchMove.bind(this));  // Handles touch tracking
     this.moveForward = false; // Flag to indicate whether the spaceship should move forward
     this.shouldFire  = false; // Flag to indicate whether to fire
+    this.particleManager = particleManager;
   }
 
   onTouchStart(pointer) {
@@ -26,11 +30,20 @@ class InputHandler {
     this.spaceship.angle = Phaser.Math.RadToDeg(angleInRad) + 90;
     this.moveForward = true;
     this.shouldFire  = true;
+    this.startJet();
+    if (!this.isSoundPlaying) {  // Only play the sound if it's not already playing
+      this.jetThrustSound.play({ loop: true, volume: 1 });
+      this.isSoundPlaying = true;
+    }
+
   }
   onTouchEnd() {
     if (this.isDpadActive) return;
     this.moveForward = false;
     this.shouldFire  = false;
+    this.stopJet();
+    this.jetThrustSound.stop()
+    this.isSoundPlaying = false;
   }
 
   onTouchMove(pointer) {
@@ -64,6 +77,17 @@ class InputHandler {
       const angleInRad = Phaser.Math.DegToRad(this.spaceship.angle);
       dx = this.spaceshipSpeed * Math.cos(angleInRad);
       dy = this.spaceshipSpeed * Math.sin(angleInRad);
+      this.startJet();
+
+      if (!this.isSoundPlaying) {  // Only play the sound if it's not already playing
+        this.jetThrustSound.play({ loop: true, volume: 1 });
+        this.isSoundPlaying = true;
+      }
+
+    } else {
+      this.stopJet();
+      this.jetThrustSound.stop()
+      this.isSoundPlaying = false;
     }
     return { dx, dy };
   }
@@ -87,6 +111,17 @@ class InputHandler {
 
   getSpacebar() {
     return this.spacebar;
+  }
+
+  startJet() {
+    const angleInRad = Phaser.Math.DegToRad(this.spaceship.angle);
+    const dx = Math.cos(angleInRad) * 30;
+    const dy = Math.sin(angleInRad) * 30;
+    this.particleManager.startJetEmitter('jetFlameEmitter', this.spaceship.x, this.spaceship.y, this.spaceship.angle);
+  }
+
+  stopJet () {
+    this.particleManager.stopEmitter('jetFlameEmitter');
   }
 }
 
