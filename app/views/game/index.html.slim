@@ -47,6 +47,8 @@ div#nameModal.modal
 
 javascript:
     $(document).ready(function () {
+        document.getElementById('audio-player').volume = 0.2;
+
         function adjustLayout() {
             if ($(window).width() <= 768) {
                 // Adjust layout for small screens

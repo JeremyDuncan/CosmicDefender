@@ -1,11 +1,14 @@
 class InputHandler {
-  constructor(input, cursors, spaceship, spaceshipSpeed, particleManager) {
+  constructor(scene, input, cursors, spaceship, spaceshipSpeed, particleManager) {
+    this.scene          = scene;
     this.input          = input;
     this.cursors        = cursors;
     this.spaceship      = spaceship;
     this.spaceshipSpeed = spaceshipSpeed;
     this.spacebar       = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.isDpadActive   = false;
+    this.jetThrustSound = this.scene.sound.add('jetThrustSound');
+    this.isSoundPlaying = false;
 
     // =====================
     // Touch event listeners
@@ -28,12 +31,19 @@ class InputHandler {
     this.moveForward = true;
     this.shouldFire  = true;
     this.startJet();
+    if (!this.isSoundPlaying) {  // Only play the sound if it's not already playing
+      this.jetThrustSound.play({ loop: true, volume: 1 });
+      this.isSoundPlaying = true;
+    }
+
   }
   onTouchEnd() {
     if (this.isDpadActive) return;
     this.moveForward = false;
     this.shouldFire  = false;
     this.stopJet();
+    this.jetThrustSound.stop()
+    this.isSoundPlaying = false;
   }
 
   onTouchMove(pointer) {
@@ -68,8 +78,16 @@ class InputHandler {
       dx = this.spaceshipSpeed * Math.cos(angleInRad);
       dy = this.spaceshipSpeed * Math.sin(angleInRad);
       this.startJet();
+
+      if (!this.isSoundPlaying) {  // Only play the sound if it's not already playing
+        this.jetThrustSound.play({ loop: true, volume: 1 });
+        this.isSoundPlaying = true;
+      }
+
     } else {
       this.stopJet();
+      this.jetThrustSound.stop()
+      this.isSoundPlaying = false;
     }
     return { dx, dy };
   }
