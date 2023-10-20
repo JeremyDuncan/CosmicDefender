@@ -78,16 +78,8 @@ class InputHandler {
       dx = this.spaceshipSpeed * Math.cos(angleInRad);
       dy = this.spaceshipSpeed * Math.sin(angleInRad);
       this.startJet();
-
-      if (!this.isSoundPlaying) {  // Only play the sound if it's not already playing
-        this.jetThrustSound.play({ loop: true, volume: 1 });
-        this.isSoundPlaying = true;
-      }
-
     } else {
       this.stopJet();
-      this.jetThrustSound.stop()
-      this.isSoundPlaying = false;
     }
     return { dx, dy };
   }
