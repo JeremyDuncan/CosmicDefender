@@ -43,6 +43,18 @@ export default class ParticleManager {
       blendMode: 'ADD',
       on: false                         // Don't start emitting immediately
     }).setPosition(0, 0).stop();
+
+    this.laserEmitter = this.scene.add.particles(500, 500, 'mainParticle', {
+      frame: 'white',
+      angle: { min: -30, max: 30 },    // Emit particles forward in a spread
+      speed: { min: 800, max: 1200 },  // Increased speed for a more explosive effect
+      lifespan: { min: 50, max: 150 }, // Shorter lifespan for quicker dissipation
+      alpha: { start: 1, end: 0 },     // Start opaque and fade out
+      scale: { start: 0.2, end: 0.1 }, // Start slightly larger and shrink', resembling a dissipating blast
+      tint: [0xff0000, 0xffa500],      // Red to orange tint for a fiery effect
+      blendMode: 'ADD',
+      on: false                        // Don't start emitting immediately
+    }).setPosition(0, 0).stop();
   }
 
   startEmitter(emitterName, x, y) {
@@ -65,6 +77,15 @@ export default class ParticleManager {
     this[emitterName].start();
   }
 
+  startLaserEmitter(emitterName, x, y, angle) {
+    const offsetDistance = 40;                                       // This is the distance from the spaceship to the emitter
+    const angleInRadians = Phaser.Math.DegToRad(angle + 90);          // Convert angle to radians, adjusting by +90 degrees
+    const emitterX = x - offsetDistance * Math.cos(angleInRadians);   // Calculate position of the emitter based on angle and offset distance
+    const emitterY = y - offsetDistance * Math.sin(angleInRadians);
+    this[emitterName].setPosition(emitterX, emitterY);
+    this[emitterName].setAngle(angle + -90);                          // Setting the angle of the emitter to be rotated
+    this[emitterName].start();
+  }
   stopEmitter(emitterName) {
     this[emitterName].stop();
   }

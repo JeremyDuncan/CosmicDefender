@@ -65,10 +65,6 @@ class GameScene extends Phaser.Scene {
     // ==================
     this.background      = new Background(this);
     this.alien           = new Alien(this);
-    this.laser           = new Laser(this);
-    this.redLaser        = new RedLaser(this);
-    this.superLaser      = new SuperLaser(this);
-    this.explosion       = new Explosion(this);
     this.scoreboard      = new Scoreboard(this);
     this.particleManager = new ParticleManager(this);
     this.virtualGamepad  = new VirtualGamepad(this);
@@ -78,6 +74,14 @@ class GameScene extends Phaser.Scene {
     this.playerSpaceship = new PlayerSpaceship(this);
     this.spaceship       = this.playerSpaceship.getSpaceship();
     this.spaceshipSpeed  = this.playerSpaceship.getSpeed();
+
+    // =================
+    // Initialize Lasers
+    // -----------------
+    this.laser           = new Laser(this, this.spaceship, this.particleManager);
+    this.redLaser        = new RedLaser(this, this.spaceship, this.particleManager);
+    this.superLaser      = new SuperLaser(this, this.spaceship, this.particleManager);
+    this.explosion       = new Explosion(this);
 
     // ============================
     // Initialize arrays and groups

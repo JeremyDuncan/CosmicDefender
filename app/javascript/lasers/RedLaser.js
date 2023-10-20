@@ -1,8 +1,9 @@
 import Laser from './Laser';
 export default class RedLaser extends Laser {
-  constructor(scene) {
-    super(scene);
-    this.laserType = 'redLaser';                              // Image
+  constructor(scene, spaceship, particleManager) {
+    super(scene, spaceship, particleManager);  // Pass spaceship and particleManager to super constructor
+
+    this.laserType = 'redLaser';                                   // Image
     this.laserSound = this.scene.sound.add('redLaserSound');  // Sound
   }
 
