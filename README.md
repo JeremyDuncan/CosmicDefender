@@ -1,4 +1,5 @@
-# Cosmic Defender Game
+# Cosmic Defender
+![Cosmic Defender](cosmic_defender.webp)
 
 ## Table of Contents
 1. [Introduction](#introduction)
