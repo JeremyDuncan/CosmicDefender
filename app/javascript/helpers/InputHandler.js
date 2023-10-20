@@ -27,11 +27,13 @@ class InputHandler {
     this.spaceship.angle = Phaser.Math.RadToDeg(angleInRad) + 90;
     this.moveForward = true;
     this.shouldFire  = true;
+    this.startJet();
   }
   onTouchEnd() {
     if (this.isDpadActive) return;
     this.moveForward = false;
     this.shouldFire  = false;
+    this.stopJet();
   }
 
   onTouchMove(pointer) {
@@ -65,6 +67,9 @@ class InputHandler {
       const angleInRad = Phaser.Math.DegToRad(this.spaceship.angle);
       dx = this.spaceshipSpeed * Math.cos(angleInRad);
       dy = this.spaceshipSpeed * Math.sin(angleInRad);
+      this.startJet();
+    } else {
+      this.stopJet();
     }
     return { dx, dy };
   }
@@ -88,6 +93,17 @@ class InputHandler {
 
   getSpacebar() {
     return this.spacebar;
+  }
+
+  startJet() {
+    const angleInRad = Phaser.Math.DegToRad(this.spaceship.angle);
+    const dx = Math.cos(angleInRad) * 30;
+    const dy = Math.sin(angleInRad) * 30;
+    this.particleManager.startJetEmitter('jetFlameEmitter', this.spaceship.x, this.spaceship.y, this.spaceship.angle);
+  }
+
+  stopJet () {
+    this.particleManager.stopEmitter('jetFlameEmitter');
   }
 }
 
