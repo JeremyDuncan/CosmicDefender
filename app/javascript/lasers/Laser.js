@@ -1,10 +1,12 @@
 export default class Laser {
-  constructor(scene) {
-    this.scene      = scene;
-    this.lasers     = this.scene.physics.add.group();
-    this.laserSound = this.scene.sound.add('laserSound');
-    this.lastFired  = 0;   // Keep track of the last time a laser was fired
-    this.fireDelay  = 200; // Delay in milliseconds between each laser fire when using touch
+  constructor(scene, spaceship, particleManager) {
+    this.spaceship       = spaceship
+    this.particleManager = particleManager
+    this.scene           = scene;
+    this.lasers          = this.scene.physics.add.group();
+    this.laserSound      = this.scene.sound.add('laserSound');
+    this.lastFired       = 0;
+    this.fireDelay       = 200;
   }
 
   // ==============================================================================
@@ -29,7 +31,9 @@ export default class Laser {
       const dy          = Math.sin(angleInRad);
       const laserStartX = spaceship.x + 20 * dx + offsetX;
       const laserStartY = spaceship.y + 20 * dy + offsetY;
-      const laser       = this.lasers.create(laserStartX, laserStartY, laserType);  // Use laserType here
+      const laser       = this.lasers.create(laserStartX, laserStartY, laserType);
+      this.laserEffect()
+
 
       laser.setScale(0.5);
       laser.setAngle(angle - 90);
@@ -57,5 +61,15 @@ export default class Laser {
 
   getLasers() {
     return this.lasers;
+  }
+
+  laserEffect() {
+    this.particleManager.startLaserEmitter('laserEmitter', this.spaceship.x, this.spaceship.y, this.spaceship.angle);
+    // ==========================================================================
+    // Schedule the stopping of the laser emitter after a small delay (e.g., 50ms)
+    // --------------------------------------------------------------------------
+    this.scene.time.delayedCall(50, () => {
+      this.particleManager.stopEmitter('laserEmitter');
+    });
   }
 }
