@@ -118,10 +118,16 @@ class InputHandler {
     const dx = Math.cos(angleInRad) * 30;
     const dy = Math.sin(angleInRad) * 30;
     this.particleManager.startJetEmitter('jetFlameEmitter', this.spaceship.x, this.spaceship.y, this.spaceship.angle);
+    if (!this.isSoundPlaying) {  // Only play the sound if it's not already playing
+      this.jetThrustSound.play({ loop: true, volume: 1 });
+      this.isSoundPlaying = true;
+    }
   }
 
   stopJet () {
     this.particleManager.stopEmitter('jetFlameEmitter');
+    this.jetThrustSound.stop()
+    this.isSoundPlaying = false;
   }
 }
 
