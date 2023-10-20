@@ -31,19 +31,12 @@ class InputHandler {
     this.moveForward = true;
     this.shouldFire  = true;
     this.startJet();
-    if (!this.isSoundPlaying) {  // Only play the sound if it's not already playing
-      this.jetThrustSound.play({ loop: true, volume: 1 });
-      this.isSoundPlaying = true;
-    }
-
   }
   onTouchEnd() {
     if (this.isDpadActive) return;
     this.moveForward = false;
     this.shouldFire  = false;
     this.stopJet();
-    this.jetThrustSound.stop()
-    this.isSoundPlaying = false;
   }
 
   onTouchMove(pointer) {
