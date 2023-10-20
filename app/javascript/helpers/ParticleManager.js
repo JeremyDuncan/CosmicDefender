@@ -42,6 +42,17 @@ export default class ParticleManager {
     particle.setDepth(-1);  // Set the depth to be below the player's ship
     this.particleGroup.add(particle);
   }
+
+  startJetEmitter(emitterName, x, y, angle) {
+    const offsetDistance = -40;                                       // This is the distance from the spaceship to the emitter
+    const angleInRadians = Phaser.Math.DegToRad(angle + 90);          // Convert angle to radians, adjusting by +90 degrees
+    const emitterX = x - offsetDistance * Math.cos(angleInRadians);   // Calculate position of the emitter based on angle and offset distance
+    const emitterY = y - offsetDistance * Math.sin(angleInRadians);
+    this[emitterName].setPosition(emitterX, emitterY);
+    this[emitterName].setAngle(angle + -90);                          // Setting the angle of the emitter to be rotated
+    this[emitterName].start();
+  }
+
   stopEmitter(emitterName) {
     this[emitterName].stop();
   }
