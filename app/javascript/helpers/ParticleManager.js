@@ -31,6 +31,18 @@ export default class ParticleManager {
       quantity: 1,
       blendMode: 'ADD'
     }).setPosition(0, 0).stop();
+
+    this.jetFlameEmitter = this.scene.add.particles(50, 50, 'mainParticle', {
+      frame: 'white',
+      angle: { min: 160, max: 200 },    // Emit particles backward, as if from the back of the jet
+      speed: { min: 400, max: 600 },    // Speed of the particles, indicating the force of the jet
+      lifespan: { min: 200, max: 600 }, // Short lifespan to resemble the burn off of a jet flame
+      alpha: { start: 1, end: 0 },      // Start opaque and fade out
+      scale: { start: 0.25, end: 0.1 }, // Start slightly larger and shrink', resembling the flame thinning out
+      tint: [0xffa500, 0xffff00],       // green to yellow tint
+      blendMode: 'ADD',
+      on: false                         // Don't start emitting immediately
+    }).setPosition(0, 0).stop();
   }
 
   startEmitter(emitterName, x, y) {
