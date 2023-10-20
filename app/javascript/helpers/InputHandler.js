@@ -1,5 +1,5 @@
 class InputHandler {
-  constructor(input, cursors, spaceship, spaceshipSpeed) {
+  constructor(input, cursors, spaceship, spaceshipSpeed, particleManager) {
     this.input          = input;
     this.cursors        = cursors;
     this.spaceship      = spaceship;
@@ -15,6 +15,7 @@ class InputHandler {
     this.input.on('pointermove', this.onTouchMove.bind(this));  // Handles touch tracking
     this.moveForward = false; // Flag to indicate whether the spaceship should move forward
     this.shouldFire  = false; // Flag to indicate whether to fire
+    this.particleManager = particleManager;
   }
 
   onTouchStart(pointer) {
