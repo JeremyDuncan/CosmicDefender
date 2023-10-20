@@ -84,7 +84,7 @@ class GameScene extends Phaser.Scene {
     this.lasers             = this.physics.add.group();
     this.alienSpaceships    = this.physics.add.group();
     this.cursors            = this.input.keyboard.createCursorKeys();
-    this.inputHandler       = new InputHandler(this.input, this.cursors, this.spaceship, this.spaceshipSpeed);
+    this.inputHandler       = new InputHandler(this.input, this.cursors, this.spaceship, this.spaceshipSpeed, this.particleManager);
     this.collisionHandler   = new CollisionHandler(this, this.laser, this.redLaser, this.superLaser, this.alien,
                                                  this.spaceship, this.explosion, this.scoreboard, this.particleManager);
     this.scale.on('resize', this.handleResize, this); // Listen for the resize event
