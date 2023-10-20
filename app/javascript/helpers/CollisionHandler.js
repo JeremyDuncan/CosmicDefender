@@ -1,6 +1,6 @@
 // CollisionHandler.js
 export default class CollisionHandler {
-  constructor(scene, laser, redLaser, superLaser, alien, spaceship, explosion, scoreboard, particleManager) {
+  constructor(scene, laser, redLaser, superLaser, alien, spaceship, explosion, scoreboard, particleManager, inputHandler) {
     this.scene      = scene;
     this.laser      = laser;
     this.redLaser   = redLaser;
@@ -12,6 +12,7 @@ export default class CollisionHandler {
     this.gemSound   = this.scene.sound.add('gemSound');
     this.particles  = this.scene.particles;
     this.particleManager = particleManager;
+    this.inputHandler    = inputHandler;
   }
 
   handleCollisions() {
@@ -90,6 +91,7 @@ export default class CollisionHandler {
       spaceship.destroy();              // Destroy Player Ship
       this.saveScore()                  // Save Score
       this.scene.inputEnabled = false;  // Disable input
+      this.inputHandler.stopJet()
 
       // =============================
       // Pause the scene after a delay
