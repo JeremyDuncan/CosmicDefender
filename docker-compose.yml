@@ -14,7 +14,7 @@ services:
     build: .
     command: ["sh", "-c", "bundle exec rails db:create && bundle exec rails db:migrate && bundle exec rails db:seed && bundle exec rails s -p ${WEB_PORT_INTERNAL} -b '0.0.0.0'"]
     volumes:
-      - .:/var/www/CosmicDefender
+      - ${APP_VOLUME_PATH}:/var/www/CosmicDefender
     ports:
       - "${WEB_PORT_EXTERNAL}:${WEB_PORT_INTERNAL}"
     depends_on:
