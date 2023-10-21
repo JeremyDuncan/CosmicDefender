@@ -24,14 +24,14 @@ RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
 # ==============================================================================
 # Copy Gemfile and install gems
 # ------------------------------------------------------------------------------
-#COPY Gemfile Gemfile
-#COPY Gemfile.lock Gemfile.lock
+COPY Gemfile Gemfile
+COPY Gemfile.lock Gemfile.lock
 RUN bundle install --without development test
 
 # ==============================================================================
 # Copy the main application
 # ------------------------------------------------------------------------------
-#COPY . .
+COPY . .
 
 # ==============================================================================
 # Precompile assets
