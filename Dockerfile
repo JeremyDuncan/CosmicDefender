@@ -14,7 +14,6 @@ ENV RAILS_ROOT /var/www/CosmicDefender
 ENV RAILS_ENV='development'
 ENV RACK_ENV='development'
 
-
 # ==============================================================================
 # Create and set the working directory
 # ------------------------------------------------------------------------------
@@ -24,19 +23,19 @@ WORKDIR $RAILS_ROOT
 # ==============================================================================
 # Install system dependencies
 # ------------------------------------------------------------------------------
-RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
+RUN apt-get update -qq && apt-get install -y nodejs postgresql-client git
 
 # ==============================================================================
-# Copy Gemfile and install gems
+# Clone the specific branch of the repository
 # ------------------------------------------------------------------------------
-COPY Gemfile Gemfile
-COPY Gemfile.lock Gemfile.lock
+RUN git clone -b docker-deploy https://github.com/JeremyDuncan/CosmicDefender.git $RAILS_ROOT
+
+# ==============================================================================
+# Install gems
+# ------------------------------------------------------------------------------
+#COPY Gemfile Gemfile
+#COPY Gemfile.lock Gemfile.lock
 RUN bundle install --without development test
-
-# ==============================================================================
-# Copy the main application
-# ------------------------------------------------------------------------------
-COPY . .
 
 # ==============================================================================
 # Precompile assets
