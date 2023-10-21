@@ -87,7 +87,7 @@ RUN echo "Application code copied"
 # ==============================================================================
 # Precompile assets
 # ------------------------------------------------------------------------------
-RUN bundle exec rails assets:precompile && echo "Assets precompiled"
+RUN bundle exec rails assets:precompile || (cat log/production.log && false)
 
 # ==============================================================================
 # Expose port 8537 to the Docker host
@@ -98,3 +98,5 @@ EXPOSE 8537
 # The default command that gets run will start the Puma server
 # ------------------------------------------------------------------------------
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+
+
