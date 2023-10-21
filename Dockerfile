@@ -6,13 +6,13 @@ FROM ruby:3.2.2
 # ==============================================================================
 # Set environment variables
 # ------------------------------------------------------------------------------
-ENV RAILS_ROOT /var/www/CosmicDefender
-ENV RAILS_ENV='production'
-ENV RACK_ENV='production'
-
 #ENV RAILS_ROOT /var/www/CosmicDefender
-#ENV RAILS_ENV='development'
-#ENV RACK_ENV='development'
+#ENV RAILS_ENV='production'
+#ENV RACK_ENV='production'
+
+ENV RAILS_ROOT /var/www/CosmicDefender
+ENV RAILS_ENV='development'
+ENV RACK_ENV='development'
 
 
 # ==============================================================================
