@@ -14,6 +14,7 @@ module CosmicDefender
     config.hosts << "cosmicdefender.jeremyd.net"
     # Allow any subdomain of jeremyd.net
     config.hosts << /\.jeremyd\.net\z/
+    config.assets.paths << Rails.root.join("app", "assets", "audio")
 
     # Configuration for the application, engines, and railties goes here.
     #
