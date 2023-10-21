@@ -31,7 +31,8 @@ RUN bundle install --without development test && echo "Gems installed"
 # ==============================================================================
 # Copy the main application
 # ------------------------------------------------------------------------------
-COPY . . && echo "Application code copied"
+COPY . .
+RUN echo "Application code copied"
 
 # ==============================================================================
 # Precompile assets
