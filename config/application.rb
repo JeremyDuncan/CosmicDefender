@@ -11,8 +11,10 @@ module CosmicDefender
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
     config.hosts << "cosmicdefender.jeremyduncan.synology.me"
+    config.hosts << "cosmicdefender.jeremyd.net"
     # Allow any subdomain of jeremyd.net
     config.hosts << /\.jeremyd\.net\z/
+    config.assets.paths << Rails.root.join("app", "assets", "audio")
 
     # Configuration for the application, engines, and railties goes here.
     #
