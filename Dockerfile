@@ -6,10 +6,6 @@ FROM ruby:3.2.2
 # ==============================================================================
 # Set environment variables
 # ------------------------------------------------------------------------------
-#ENV RAILS_ROOT /var/www/CosmicDefender
-#ENV RAILS_ENV='production'
-#ENV RACK_ENV='production'
-
 ENV RAILS_ROOT /var/www/CosmicDefender
 ENV RAILS_ENV='development'
 ENV RACK_ENV='development'
@@ -23,19 +19,19 @@ WORKDIR $RAILS_ROOT
 # ==============================================================================
 # Install system dependencies
 # ------------------------------------------------------------------------------
-RUN apt-get update -qq && apt-get install -y nodejs postgresql-client git
+RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
 
 # ==============================================================================
-# Clone the specific branch of the repository
+# Copy Gemfile and install gems
 # ------------------------------------------------------------------------------
-RUN git clone -b docker-deploy https://github.com/JeremyDuncan/CosmicDefender.git $RAILS_ROOT
-
-# ==============================================================================
-# Install gems
-# ------------------------------------------------------------------------------
-#COPY Gemfile Gemfile
-#COPY Gemfile.lock Gemfile.lock
+COPY Gemfile Gemfile
+COPY Gemfile.lock Gemfile.lock
 RUN bundle install --without development test
+
+# ==============================================================================
+# Copy the main application
+# ------------------------------------------------------------------------------
+COPY . .
 
 # ==============================================================================
 # Precompile assets
