@@ -1,0 +1,60 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2  # Use v2 instead of v3
+
+    - name: Set up environment variables
+      run: |
+        echo "WEB_PORT_INTERNAL=3000" >> $GITHUB_ENV
+        echo "WEB_PORT_EXTERNAL=80" >> $GITHUB_ENV
+        echo "APP_VOLUME_PATH=./app" >> $GITHUB_ENV
+        echo "GAME_API_PORT=8080" >> $GITHUB_ENV
+        # ... additional non-sensitive variables
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: jduncan2022/cosmic-defender:$(date +%s) 
+        
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Cache Docker layers
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v1 
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push Docker Compose
+      run: |
+        docker-compose -f docker-compose.yml build
+        docker-compose -f docker-compose.yml up -d
+      env:
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+        RAILS_ENV: production
+        RACK_ENV: production
+        WEB_PORT_EXTERNAL: 8537
+        WEB_PORT_INTERNAL: 8537
+        GAME_API_PORT: https://cosmicdefender.jeremyd.net/
+        APP_VOLUME_PATH: /volume2/docker/a_test/CosmicDefender
