@@ -18,6 +18,7 @@ services:
       - |
         rm -f tmp/pids/server.pid && \
         bundle exec rails db:create db:migrate db:seed && \
+        bundle exec rails assets:precompile && \
         bundle exec rails s -p ${WEB_PORT_INTERNAL} -b '0.0.0.0'
     volumes:
       - ${APP_VOLUME_PATH}:/var/www/CosmicDefender
