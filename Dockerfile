@@ -87,7 +87,8 @@ RUN echo "Application code copied"
 # ==============================================================================
 # Precompile assets
 # ------------------------------------------------------------------------------
-RUN bundle exec rails assets:precompile || (cat log/production.log && false)
+RUN echo "RUNNING bundle exec rails assets:precompile"
+RUN bundle exec rails assets:precompile
 
 # ==============================================================================
 # Expose port 8537 to the Docker host
