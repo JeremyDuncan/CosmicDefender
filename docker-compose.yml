@@ -8,25 +8,24 @@ services:
     volumes:
       - cosmic_defender_pg_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mysecretpassword}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
   web:
     build: .
-    command: ["sh", "-c", "bundle exec rails db:create && bundle exec rails db:migrate && bundle exec rails db:seed && bundle exec rails s -p 8537 -b '0.0.0.0'"]
+    command: ["sh", "-c", "bundle exec rails db:create && bundle exec rails db:migrate && bundle exec rails db:seed && bundle exec rails s -p ${WEB_PORT_INTERNAL} -b '0.0.0.0'"]
     volumes:
       - .:/var/www/CosmicDefender
     ports:
-      - "8537:8537"
+      - "${WEB_PORT_EXTERNAL}:${WEB_PORT_INTERNAL}"
     depends_on:
       - db
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mysecretpassword}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       RAILS_ENV: production
       RACK_ENV: production
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
-      DATABASE_URL: "postgresql://postgres:${POSTGRES_PASSWORD:-mysecretpassword}@db:5432/CosmicDefender_production"
-      GAME_API_PORT: "https://cosmicdefender.jeremyd.net/"
-      # GAME_API_PORT: "https://cosmicdefender.jeremyduncan.synology.me/"
+      DATABASE_URL: "postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/CosmicDefender_production"
+      GAME_API_PORT: ${GAME_API_PORT}
 
 volumes:
   cosmic_defender_pg_data:
