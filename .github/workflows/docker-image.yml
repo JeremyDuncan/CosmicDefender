@@ -26,7 +26,8 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: jduncan2022/cosmic-defender:$(date +%s) 
+        tags: jduncan2022/cosmic-defender:${{ github.sha }}
+
         
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
