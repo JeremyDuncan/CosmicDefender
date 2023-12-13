@@ -20,7 +20,7 @@ class Scoreboard {
   // -----------------------------------------------
   async updatePlayerScoreInDB(playerId) {
     const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
-    const domain    =  window.GAME_API_PORT == 3000 ? "http://localhost:3000" : window.GAME_API_PORT
+    const domain    =  window.GAME_API_PORT == 3002 ? "http://localhost:3002" : window.GAME_API_PORT
     const url       = `${domain}/api/v1/players/${playerId}/update_score`;
 
     try {
